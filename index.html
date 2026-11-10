@@ -878,12 +878,13 @@ float fan(vec2 c){
 float shaftsV(vec2 uv){
   float y=uv.y; float asp=R.x/R.y;
   float x=(uv.x-.5)*max(asp,1.9)/(1.+y*.55) + y*.12;
+  float t=T*2.;                                       /* 2x faster so it matches the floor caustics */
   float s=0.;
-  s+=pow(vn(x*7. + T*.18),3.)*.55;
-  s+=pow(vn(x*13.+ 7.3 - T*.23),4.)*.45;
-  s+=pow(vn(x*23.+ 3.1 + T*.31),5.)*.35;
-  s+=pow(vn(x*3.5+ 1.7 + T*.09),2.)*.35;
-  float flick=.75+.25*vn(T*.6+x*2.);
+  s+=pow(vn(x*7. + t*.18),3.)*.55;
+  s+=pow(vn(x*13.+ 7.3 - t*.23),4.)*.45;
+  s+=pow(vn(x*23.+ 3.1 + t*.31),5.)*.35;
+  s+=pow(vn(x*3.5+ 1.7 + t*.09),2.)*.35;
+  float flick=.75+.25*vn(t*.6+x*2.);
   return smoothstep(-.1,1.05,clamp(s*flick,0.,1.));   /* gentler contrast */
 }
 /* --- B: sun shafts through water: many thin streaks fanning from an off-centre sun --- */
