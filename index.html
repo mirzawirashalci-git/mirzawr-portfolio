@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&family=Rubik:wght@400&display=swap" rel="stylesheet">
+<script>try{if(localStorage.getItem('mw-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
 <style>
   :root{
     --ink:#101010; --ink-2:#32302e; --ink-3:#464542; --muted:#767472; --muted-2:#737373;
@@ -210,6 +211,16 @@
   .tip kbd{font-family:'Geist Mono',monospace;font-size:10px;color:#bdbbb8;background:rgba(255,255,255,.1);border-radius:4px;padding:2px 4px}
   .nav-item:hover .tip,.nav-item:focus-visible .tip{opacity:1;transform:translate(-50%,0)}
 
+  /* ---------- Light / dark toggle ---------- */
+  .nav-sep{width:1px;height:18px;background:#e2e1df;flex:none}
+  .nav-theme svg{position:absolute;left:13px;top:13px;transition:transform .5s var(--spring),opacity .25s}
+  .nav-theme .i-moon{opacity:0;transform:rotate(-90deg) scale(.4)}
+  html.dark .nav-theme .i-sun{opacity:0;transform:rotate(90deg) scale(.4)}
+  html.dark .nav-theme .i-moon{opacity:1;transform:none}
+  .nav-theme:hover .i-sun{transform:rotate(45deg) scale(1.12)}
+  html.dark .nav-theme:hover .i-moon{transform:rotate(-14deg) scale(1.12)}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:.45s}
+
   .btn-talk{position:relative;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:20px;overflow:hidden;
     background:linear-gradient(#8fd4fc,#60c3f9);color:#002334;font-family:-apple-system,'SF Pro Text',system-ui,sans-serif;font-weight:500;font-size:15px;letter-spacing:-.23px;
     box-shadow:0 0 0 1px rgba(0,0,0,.08),0 2px 2px rgba(0,0,0,.04),0 0 0 1px #77cbfb,inset 0 0 1px 1px rgba(255,255,255,.18);
@@ -328,11 +339,63 @@
   .ph{border:1px dashed var(--line);border-radius:16px;padding:40px 24px;text-align:center;color:var(--muted);font-size:14px;line-height:22px;margin-top:24px}
   .ph h2{font-size:24px;line-height:32px;font-weight:500;color:var(--ink);margin-bottom:6px}
 
+  /* ================= DARK MODE ================= */
+  html.dark{color-scheme:dark;
+    --ink:#ecebe9; --ink-2:#dedcd9; --ink-3:#b8b6b2; --muted:#93918d; --muted-2:#a3a19d;
+    --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.12); --bg:#0b1728; --bg-rgb:11,23,40;
+    --hover:rgba(255,255,255,.05); --chip:rgba(255,255,255,.06); --chip-h:rgba(255,255,255,.11)}
+  html.grad.dark{--bg-rgb:11,23,40}
+  html.grad.dark body{background:linear-gradient(to bottom,#0b1728 0%,#0b1728 18%,#0d1e35 55%,#102744 100%)}
+  html.grad.dark body.on-study{background:#17181a;--bg:#17181a;--bg-rgb:23,24,26}
+  /* nav */
+  html.dark .nav{background:rgba(30,32,36,.78);box-shadow:0 0 0 1px rgba(255,255,255,.1),0 8px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
+  html.dark .nav-item:hover,html.dark .nav-item:focus-visible{background:rgba(255,255,255,.08)}
+  html.dark .nav-item svg [stroke="#767472"]{stroke:#9d9b97}
+  html.dark .nav-item svg [fill="#767472"]{fill:#9d9b97}
+  html.dark .nav-item[aria-current] svg path[stroke]{stroke:#f4f3f1}
+  html.dark .nav-item[aria-current] svg path[fill="#767472"]{fill:#f4f3f1}
+  html.dark .nav-dot{background:#f4f3f1}
+  html.dark .nav-sep{background:rgba(255,255,255,.14)}
+  html.dark .tip{background:#f4f3f1;color:#1e1d1b}
+  html.dark .tip kbd{color:#5c5a58;background:rgba(0,0,0,.08)}
+  html.dark .nav-back{background:linear-gradient(#34363a,#2a2c30);color:#f0efed;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 2px 2px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.08)}
+  html.dark .nav-back svg path{stroke:#f0efed}
+  /* home */
+  html.dark .arrow path{stroke:var(--ink-2)}
+  html.dark .logo{box-shadow:0 0 0 .5px rgba(255,255,255,.14)}
+  html.dark .chip{box-shadow:0 0 0 1px rgba(255,255,255,.1),inset 0 .7px 0 rgba(255,255,255,.06)}
+  html.dark .chip svg path{stroke:var(--muted-2)}
+  html.dark .chip:hover svg path{stroke:var(--ink-2)}
+  html.dark .shot:hover{box-shadow:0 12px 28px -12px rgba(0,0,0,.6)}
+  html.dark footer .ask,html.dark footer .visits b,html.dark footer .visits sup{color:var(--ink)}
+  html.dark .toast{background:#f4f3f1;color:#1e1d1b}
+  /* study case pages */
+  html.dark .sc-title,html.dark .sc-sec h2,html.dark .sc-p b,html.dark .sc-sub,html.dark .sc-ol li::marker,html.dark .sc-ol b,html.dark .sc-list b{color:#f0efed}
+  html.dark .sc-p,html.dark .sc-list ul,html.dark .sc-list p,html.dark .sc-num,html.dark .sc-ol{color:#bebcb8}
+  html.dark .sc-meta dt,html.dark .sc-next small{color:rgba(160,158,154,.8)}
+  html.dark .sc-meta dd,html.dark .sc-list h3,html.dark .sc-num b{color:#a8a6a2}
+  html.dark .sc-num.green span{color:#bebcb8}
+  html.dark .sc-num.red i{background:rgba(253,78,78,.16);color:#ff7b7b}
+  html.dark .sc-card{background:#1f2023;border-color:rgba(255,255,255,.1)}
+  html.dark .sc-card b{color:#f0efed}
+  html.dark .sc-card span{color:#a9adb5}
+  html.dark .sc-table{background:#1f2023;border-color:rgba(255,255,255,.1)}
+  html.dark .sc-table th,html.dark .sc-table td{border-color:rgba(255,255,255,.1);color:#ecebe9}
+  html.dark .sc-table td + td{color:#a9adb5}
+  html.dark .sc-table tbody tr:hover td{background:#26282b}
+  html.dark .sc-fig figcaption{color:#6cbcf7}
+  html.dark .sc-quote{background:#222427;color:#cfcdc9}
+  html.dark .sc-fig .shot.shadow img{box-shadow:0 4.7px 17.7px rgba(0,0,0,.35)}
+
   @media (max-width:560px){
     .proj{grid-template-columns:44px 1fr}
     .proj .desc{grid-column:2}
     .debto{flex-direction:column}
     .nav{gap:2px}
+    .nav-item{width:40px;height:40px}
+    .nav-dot{top:41px;left:24px}
+    .nav-theme svg{left:11px;top:11px}
+    .nav-sep{margin:0 2px}
     .header .btn-talk span{display:none}
     body.on-study .nav-back{max-width:44px;padding:0 13px;font-size:0;gap:0}
     .header .btn-talk{padding:0 13px}
@@ -370,6 +433,12 @@
       <span class="tip">Work <kbd>G</kbd><kbd>W</kbd></span>
     </a>
     <span class="nav-dot" aria-hidden="true"></span>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <button class="nav-item nav-theme" type="button" aria-label="Switch to dark mode">
+      <svg class="i-sun" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3.25" fill="#767472" fill-opacity="0.3" stroke="#767472" stroke-width="1.5"/><path d="M9 1.75V2.75M9 15.25V16.25M16.25 9H15.25M2.75 9H1.75M14.127 3.873L13.42 4.58M4.58 13.42L3.873 14.127M14.127 14.127L13.42 13.42M4.58 4.58L3.873 3.873" stroke="#767472" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg class="i-moon" viewBox="0 0 18 18" fill="none"><path d="M15.25 10.9C14.43 11.31 13.5 11.54 12.52 11.54C9.17 11.54 6.46 8.83 6.46 5.48C6.46 4.5 6.69 3.57 7.1 2.75C4.6 3.5 2.75 5.82 2.75 8.58C2.75 11.95 5.48 14.68 8.85 14.68C12.22 14.68 14.94 12.4 15.25 10.9Z" fill="#767472" fill-opacity="0.3" stroke="#767472" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="tip">Dark mode</span>
+    </button>
     <button class="btn-talk js-talk" type="button">
       <svg viewBox="0 0 17 17" fill="none"><path d="M12.75 3.825H4.25C3.07639 3.825 2.125 4.7764 2.125 5.95V11.05C2.125 12.2236 3.07639 13.175 4.25 13.175H12.75C13.9236 13.175 14.875 12.2236 14.875 11.05V5.95C14.875 4.7764 13.9236 3.825 12.75 3.825Z" stroke="#002334" stroke-width="1.275"/><path d="M3.06 5.865L8.5 9.52L13.94 5.865" stroke="#002334" stroke-width="1.275" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Let’s talk</span>
@@ -556,7 +625,7 @@
   $$('.js-talk, .js-copy').forEach(b => b.addEventListener('click', copyEmail));
 
   /* ---------- Nav dot + scrollspy ---------- */
-  const navItems = $$('.nav-item'); const dot = $('.nav-dot');
+  const navItems = $$('.nav-item[data-target]'); const dot = $('.nav-dot');
   const setActive = key => {
     const i = navItems.findIndex(n => n.dataset.target === key); if (i < 0) return;
     dot.style.transform = `translateX(${navItems[i].offsetLeft - 6}px)`;
@@ -583,6 +652,24 @@
   };
   navItems.forEach(n => n.addEventListener('click', e => { e.preventDefault(); goTo(n.dataset.target); }));
   $('.nav-back').addEventListener('click', e => { e.preventDefault(); goTo('study'); });
+
+  /* ---------- Light / dark mode ---------- */
+  const themeBtn = $('.nav-theme'), themeTip = $('.tip', themeBtn);
+  const syncTheme = () => {
+    const dark = document.documentElement.classList.contains('dark');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeTip.textContent = dark ? 'Light mode' : 'Dark mode';
+  };
+  themeBtn.addEventListener('click', () => {
+    const flip = () => {
+      const dark = document.documentElement.classList.toggle('dark');
+      try { localStorage.setItem('mw-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      syncTheme(); dispatchEvent(new Event('themechange'));
+    };
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !calm) document.startViewTransition(flip); else flip();
+  });
+  syncTheme();
 
   /* Keyboard: G then H/S/P/E/W */
   let gAt = 0;
@@ -973,6 +1060,8 @@ void main(){
     {n:'Netral',   c:[[.62,.64,.68],[.80,.81,.84],[.98,.98,.98]],g:.9,   sw:'#a7aab0'},
   ];
   let pal = 0;
+  /* dark mode: softer, cooler moonlight */
+  const NIGHT = {n:'Malam', c:[[.16,.38,.70],[.32,.58,.88],[.78,.88,1.]], g:.78};
   const uC1 = gl.getUniformLocation(pr,'C1'), uC2 = gl.getUniformLocation(pr,'C2'), uC3 = gl.getUniformLocation(pr,'C3'), uG = gl.getUniformLocation(pr,'G');
   const setBg = () => {};
   const SCALE = .75; // render at half res; CSS blur hides it and saves battery
@@ -984,7 +1073,7 @@ void main(){
   const draw = now => {
     if (!cv.classList.contains('on')) cv.classList.add('on');
     if (!cv.width || !cv.height) size();
-    gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.uniform1f(uM, mode); const P = PAL[pal]; gl.uniform3fv(uC1, P.c[0]); gl.uniform3fv(uC2, P.c[1]); gl.uniform3fv(uC3, P.c[2]); gl.uniform1f(uG, P.g);
+    gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.uniform1f(uM, mode); const P = document.documentElement.classList.contains('dark') ? NIGHT : PAL[pal]; gl.uniform3fv(uC1, P.c[0]); gl.uniform3fv(uC2, P.c[1]); gl.uniform3fv(uC3, P.c[2]); gl.uniform1f(uG, P.g);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     if (!reduce && visible) raf = requestAnimationFrame(draw);
   };
@@ -993,6 +1082,7 @@ void main(){
   cv.addEventListener('webglcontextlost', e => { e.preventDefault(); cancelAnimationFrame(raf); });
   cv.addEventListener('webglcontextrestored', () => location.reload());
   setBg(0);
+  addEventListener('themechange', () => { if (reduce) draw(performance.now()); });
   draw(performance.now());
 })();
 
@@ -1003,7 +1093,7 @@ void main(){
   if (!gl) return;
   const vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   const fs = `precision highp float;
-uniform vec2 R; uniform float T;
+uniform vec2 R; uniform float T; uniform float D;
 vec2 h2(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return fract(sin(p)*43758.5453);}
 float edge(vec2 x,float t){
   vec2 n=floor(x),f=fract(x); float f1=8.,f2=8.;
@@ -1034,6 +1124,11 @@ void main(){
   vec3 cream=vec3(1.,.995,.97);
   vec3 col=mix(water,cream,k);
   float a=mix(.30+.10*(1.-far),.72,k*.85);
+  if(D>.5){                                      /* dark mode: deep water, moonlit lines */
+    water=mix(vec3(.09,.19,.34),vec3(.07,.15,.29),cell*.6);
+    col=mix(water,vec3(.42,.62,.88),k);
+    a=mix(.16+.06*(1.-far),.34,k*.85);
+  }
   gl_FragColor=vec4(col*a,a);
 }`;
   const sh = (t, src) => { const o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return o; };
@@ -1044,17 +1139,18 @@ void main(){
   const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
   const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const uR = gl.getUniformLocation(pr, 'R'), uT = gl.getUniformLocation(pr, 'T');
+  const uR = gl.getUniformLocation(pr, 'R'), uT = gl.getUniformLocation(pr, 'T'), uD = gl.getUniformLocation(pr, 'D');
   const SCALE = Math.min(window.devicePixelRatio || 1, 2) * .6;
   const size = () => { cv.width = Math.max(1, cv.clientWidth * SCALE | 0); cv.height = Math.max(1, cv.clientHeight * SCALE | 0); gl.viewport(0, 0, cv.width, cv.height); };
   size(); window.addEventListener('resize', size);
   if ('ResizeObserver' in window) new ResizeObserver(() => size()).observe(cv);   /* re-measure when the canvas reappears (e.g. back from a study case) */
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible = false, raf = 0; const t0 = performance.now() - 15000;
-  const draw = now => { if (!cv.classList.contains('on')) cv.classList.add('on'); gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); if (!reduce && visible) raf = requestAnimationFrame(draw); };
+  const draw = now => { if (!cv.classList.contains('on')) cv.classList.add('on'); gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.uniform1f(uD, document.documentElement.classList.contains('dark') ? 1 : 0); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); if (!reduce && visible) raf = requestAnimationFrame(draw); };
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; cancelAnimationFrame(raf); if (visible) raf = requestAnimationFrame(draw); }).observe(cv);
   cv.addEventListener('webglcontextlost', e => { e.preventDefault(); cancelAnimationFrame(raf); });
   document.addEventListener('visibilitychange', () => { cancelAnimationFrame(raf); if (!document.hidden && visible) raf = requestAnimationFrame(draw); });
+  addEventListener('themechange', () => { if (reduce) draw(performance.now()); });
   draw(performance.now());
 })();
 
