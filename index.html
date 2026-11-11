@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&family=Rubik:wght@400&display=swap" rel="stylesheet">
+<script>try{if(localStorage.getItem('mw-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
 <style>
   :root{
     --ink:#101010; --ink-2:#32302e; --ink-3:#464542; --muted:#767472; --muted-2:#737373;
@@ -210,6 +211,16 @@
   .tip kbd{font-family:'Geist Mono',monospace;font-size:10px;color:#bdbbb8;background:rgba(255,255,255,.1);border-radius:4px;padding:2px 4px}
   .nav-item:hover .tip,.nav-item:focus-visible .tip{opacity:1;transform:translate(-50%,0)}
 
+  /* ---------- Light / dark toggle ---------- */
+  .nav-sep{width:1px;height:18px;background:#e2e1df;flex:none}
+  .nav-theme svg{position:absolute;left:13px;top:13px;transition:transform .5s var(--spring),opacity .25s}
+  .nav-theme .i-moon{opacity:0;transform:rotate(-90deg) scale(.4)}
+  html.dark .nav-theme .i-sun{opacity:0;transform:rotate(90deg) scale(.4)}
+  html.dark .nav-theme .i-moon{opacity:1;transform:none}
+  .nav-theme:hover .i-sun{transform:rotate(45deg) scale(1.12)}
+  html.dark .nav-theme:hover .i-moon{transform:rotate(-14deg) scale(1.12)}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:.45s}
+
   .btn-talk{position:relative;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:20px;overflow:hidden;
     background:linear-gradient(#8fd4fc,#60c3f9);color:#002334;font-family:-apple-system,'SF Pro Text',system-ui,sans-serif;font-weight:500;font-size:15px;letter-spacing:-.23px;
     box-shadow:0 0 0 1px rgba(0,0,0,.08),0 2px 2px rgba(0,0,0,.04),0 0 0 1px #77cbfb,inset 0 0 1px 1px rgba(255,255,255,.18);
@@ -328,11 +339,65 @@
   .ph{border:1px dashed var(--line);border-radius:16px;padding:40px 24px;text-align:center;color:var(--muted);font-size:14px;line-height:22px;margin-top:24px}
   .ph h2{font-size:24px;line-height:32px;font-weight:500;color:var(--ink);margin-bottom:6px}
 
+  /* ================= DARK MODE ================= */
+  html.dark{color-scheme:dark;
+    --ink:#f8f7f5; --ink-2:#f0efed; --ink-3:#dcdad6; --muted:#bdbbb7; --muted-2:#c9c7c3;
+    --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.12); --bg:#0b1728; --bg-rgb:11,23,40;
+    --hover:rgba(255,255,255,.05); --chip:rgba(255,255,255,.06); --chip-h:rgba(255,255,255,.11)}
+  html.grad.dark{--bg:#123c6b;--bg-rgb:6,16,32}
+  /* home: blue at the top, sinking to very deep blue at the bottom */
+  html.grad.dark body{background:linear-gradient(to bottom,#123c6b 0%,#0e2f56 18%,#08182f 55%,#030a16 100%)}
+  html.dark .beams::after{background:none}
+  html.grad.dark body.on-study{background:#17181a;--bg:#17181a;--bg-rgb:23,24,26}
+  /* nav */
+  html.dark .nav{background:rgba(30,32,36,.78);box-shadow:0 0 0 1px rgba(255,255,255,.1),0 8px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
+  html.dark .nav-item:hover,html.dark .nav-item:focus-visible{background:rgba(255,255,255,.08)}
+  html.dark .nav-item svg [stroke="#767472"]{stroke:#b8b6b2}
+  html.dark .nav-item svg [fill="#767472"]{fill:#b8b6b2}
+  html.dark .nav-item[aria-current] svg path[stroke]{stroke:#f4f3f1}
+  html.dark .nav-item[aria-current] svg path[fill="#767472"]{fill:#f4f3f1}
+  html.dark .nav-dot{background:#f4f3f1}
+  html.dark .nav-sep{background:rgba(255,255,255,.14)}
+  html.dark .tip{background:#f4f3f1;color:#1e1d1b}
+  html.dark .tip kbd{color:#5c5a58;background:rgba(0,0,0,.08)}
+  html.dark .nav-back{background:linear-gradient(#34363a,#2a2c30);color:#f0efed;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 2px 2px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.08)}
+  html.dark .nav-back svg path{stroke:#f0efed}
+  /* home */
+  html.dark .arrow path{stroke:var(--ink-2)}
+  html.dark .logo{box-shadow:0 0 0 .5px rgba(255,255,255,.14)}
+  html.dark .chip{box-shadow:0 0 0 1px rgba(255,255,255,.1),inset 0 .7px 0 rgba(255,255,255,.06)}
+  html.dark .chip svg path{stroke:var(--muted-2)}
+  html.dark .chip:hover svg path{stroke:var(--ink-2)}
+  html.dark .shot:hover{box-shadow:0 12px 28px -12px rgba(0,0,0,.6)}
+  html.dark footer .ask,html.dark footer .visits b,html.dark footer .visits sup{color:var(--ink)}
+  html.dark .toast{background:#f4f3f1;color:#1e1d1b}
+  /* study case pages */
+  html.dark .sc-title,html.dark .sc-sec h2,html.dark .sc-p b,html.dark .sc-sub,html.dark .sc-ol li::marker,html.dark .sc-ol b,html.dark .sc-list b{color:#f0efed}
+  html.dark .sc-p,html.dark .sc-list ul,html.dark .sc-list p,html.dark .sc-num,html.dark .sc-ol{color:#dcdad6}
+  html.dark .sc-meta dt,html.dark .sc-next small{color:#b3b1ad}
+  html.dark .sc-meta dd,html.dark .sc-list h3,html.dark .sc-num b{color:#cdcbc7}
+  html.dark .sc-num.green span{color:#dcdad6}
+  html.dark .sc-num.red i{background:rgba(253,78,78,.16);color:#ff7b7b}
+  html.dark .sc-card{background:#1f2023;border-color:rgba(255,255,255,.1)}
+  html.dark .sc-card b{color:#f0efed}
+  html.dark .sc-card span{color:#cfd3da}
+  html.dark .sc-table{background:#1f2023;border-color:rgba(255,255,255,.1)}
+  html.dark .sc-table th,html.dark .sc-table td{border-color:rgba(255,255,255,.1);color:#ecebe9}
+  html.dark .sc-table td + td{color:#cfd3da}
+  html.dark .sc-table tbody tr:hover td{background:#26282b}
+  html.dark .sc-fig figcaption{color:#8fcdfa}
+  html.dark .sc-quote{background:#222427;color:#e4e2de}
+  html.dark .sc-fig .shot.shadow img{box-shadow:0 4.7px 17.7px rgba(0,0,0,.35)}
+
   @media (max-width:560px){
     .proj{grid-template-columns:44px 1fr}
     .proj .desc{grid-column:2}
     .debto{flex-direction:column}
     .nav{gap:2px}
+    .nav-item{width:40px;height:40px}
+    .nav-dot{top:41px;left:24px}
+    .nav-theme svg{left:11px;top:11px}
+    .nav-sep{margin:0 2px}
     .header .btn-talk span{display:none}
     body.on-study .nav-back{max-width:44px;padding:0 13px;font-size:0;gap:0}
     .header .btn-talk{padding:0 13px}
@@ -370,6 +435,12 @@
       <span class="tip">Work <kbd>G</kbd><kbd>W</kbd></span>
     </a>
     <span class="nav-dot" aria-hidden="true"></span>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <button class="nav-item nav-theme" type="button" aria-label="Switch to dark mode">
+      <svg class="i-sun" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3.25" fill="#767472" fill-opacity="0.3" stroke="#767472" stroke-width="1.5"/><path d="M9 1.75V2.75M9 15.25V16.25M16.25 9H15.25M2.75 9H1.75M14.127 3.873L13.42 4.58M4.58 13.42L3.873 14.127M14.127 14.127L13.42 13.42M4.58 4.58L3.873 3.873" stroke="#767472" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg class="i-moon" viewBox="0 0 18 18" fill="none"><path d="M15.25 10.9C14.43 11.31 13.5 11.54 12.52 11.54C9.17 11.54 6.46 8.83 6.46 5.48C6.46 4.5 6.69 3.57 7.1 2.75C4.6 3.5 2.75 5.82 2.75 8.58C2.75 11.95 5.48 14.68 8.85 14.68C12.22 14.68 14.94 12.4 15.25 10.9Z" fill="#767472" fill-opacity="0.3" stroke="#767472" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="tip">Dark mode</span>
+    </button>
     <button class="btn-talk js-talk" type="button">
       <svg viewBox="0 0 17 17" fill="none"><path d="M12.75 3.825H4.25C3.07639 3.825 2.125 4.7764 2.125 5.95V11.05C2.125 12.2236 3.07639 13.175 4.25 13.175H12.75C13.9236 13.175 14.875 12.2236 14.875 11.05V5.95C14.875 4.7764 13.9236 3.825 12.75 3.825Z" stroke="#002334" stroke-width="1.275"/><path d="M3.06 5.865L8.5 9.52L13.94 5.865" stroke="#002334" stroke-width="1.275" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Let’s talk</span>
@@ -468,6 +539,7 @@
       <button class="chip js-copy" type="button"><svg viewBox="0 0 16 16" fill="none"><path d="M1.33334 4L5.94202 6.61131C7.64108 7.574 8.35894 7.574 10.058 6.61131L14.6667 4" stroke="#737373" stroke-width="1.33333" stroke-linejoin="round"/><path d="M1.34386 8.98365C1.38744 11.0274 1.40923 12.0492 2.16332 12.8062C2.9174 13.5631 3.9669 13.5895 6.0659 13.6422C7.35954 13.6747 8.64048 13.6747 9.93414 13.6422C12.0331 13.5895 13.0826 13.5631 13.8367 12.8062C14.5908 12.0492 14.6126 11.0274 14.6561 8.98365C14.6702 8.32652 14.6702 7.67332 14.6561 7.01619C14.6126 4.97249 14.5908 3.95065 13.8367 3.19369C13.0826 2.43674 12.0331 2.41037 9.93414 2.35763C8.64048 2.32513 7.35954 2.32513 6.06589 2.35763C3.9669 2.41036 2.9174 2.43673 2.16331 3.19369C1.40922 3.95064 1.38744 4.97249 1.34385 7.01619C1.32984 7.67332 1.32984 8.32652 1.34386 8.98365Z" stroke="#737373" stroke-width="1.33333" stroke-linejoin="round"/></svg>Email</button>
       <a class="chip" href="https://github.com/mirzawirashalci-git" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none"><path d="M6.66665 13.7116C4.38093 14.4831 2.47617 13.7116 1.33331 11.3333" stroke="#737373" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.66665 14.6666V12.5052C6.66665 12.1063 6.78925 11.7597 6.98691 11.4465C7.12251 11.2317 7.02965 10.9269 6.78471 10.8595C4.75594 10.3018 3.33331 9.40505 3.33331 6.43062C3.33331 5.65732 3.58668 4.93029 4.03205 4.29752C4.14289 4.14004 4.19831 4.0613 4.21163 3.98998C4.22495 3.91867 4.20179 3.8256 4.15546 3.63946C3.9669 2.88186 3.97912 2.07738 4.26213 1.35207C4.26213 1.35207 4.84693 1.16153 6.17797 1.99304C6.48186 2.1829 6.63381 2.27782 6.76765 2.29906C6.90145 2.32029 7.08038 2.27581 7.43818 2.18686C7.92751 2.06522 8.43171 1.99992 8.99998 1.99992C9.56825 1.99992 10.0724 2.06522 10.5618 2.18686C10.9196 2.27581 11.0985 2.32029 11.2323 2.29906C11.3662 2.27782 11.5181 2.1829 11.822 1.99304C13.153 1.16153 13.7378 1.35207 13.7378 1.35207C14.0208 2.07738 14.033 2.88186 13.8445 3.63946C13.7982 3.8256 13.775 3.91867 13.7883 3.98998C13.8016 4.0613 13.857 4.14004 13.9679 4.29752C14.4132 4.93029 14.6666 5.65732 14.6666 6.43062C14.6666 9.40505 13.244 10.3018 11.2152 10.8595C10.9703 10.9269 10.8774 11.2317 11.013 11.4465C11.2107 11.7597 11.3333 12.1063 11.3333 12.5052V14.6666" stroke="#737373" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/></svg>GitHub</a>
       <a class="chip" href="https://www.linkedin.com/in/mirzawirashalci/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none"><path d="M4.66669 6.66675V11.3334" stroke="#737373" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.33331 8.66675V11.3334M7.33331 8.66675C7.33331 7.56215 8.22871 6.66675 9.33331 6.66675C10.4379 6.66675 11.3333 7.56215 11.3333 8.66675V11.3334M7.33331 8.66675V6.66675" stroke="#737373" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.67201 4.66675H4.66602" stroke="#737373" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.66669 8.00008C1.66669 5.01452 1.66669 3.52174 2.59418 2.59424C3.52168 1.66675 5.01446 1.66675 8.00002 1.66675C10.9856 1.66675 12.4784 1.66675 13.4059 2.59424C14.3334 3.52174 14.3334 5.01452 14.3334 8.00008C14.3334 10.9856 14.3334 12.4784 13.4059 13.4059C12.4784 14.3334 10.9856 14.3334 8.00002 14.3334C5.01446 14.3334 3.52168 14.3334 2.59418 13.4059C1.66669 12.4784 1.66669 10.9856 1.66669 8.00008Z" stroke="#737373" stroke-width="1.33333" stroke-linejoin="round"/></svg>LinkedIn</a>
+      <a class="chip" href="https://www.instagram.com/mirzawr.svg/" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none"><rect x="1.66669" y="1.66675" width="12.6667" height="12.6667" rx="3.66667" stroke="#737373" stroke-width="1.33333" stroke-linejoin="round"/><path d="M10.6667 8.00008C10.6667 9.47284 9.47278 10.6667 8.00002 10.6667C6.52726 10.6667 5.33335 9.47284 5.33335 8.00008C5.33335 6.52732 6.52726 5.33341 8.00002 5.33341C9.47278 5.33341 10.6667 6.52732 10.6667 8.00008Z" stroke="#737373" stroke-width="1.33333"/><path d="M11.6727 4.33325H11.6667" stroke="#737373" stroke-width="1.77778" stroke-linecap="round" stroke-linejoin="round"/></svg>Instagram</a>
     </div>
   </section>
 </div>
@@ -556,7 +628,7 @@
   $$('.js-talk, .js-copy').forEach(b => b.addEventListener('click', copyEmail));
 
   /* ---------- Nav dot + scrollspy ---------- */
-  const navItems = $$('.nav-item'); const dot = $('.nav-dot');
+  const navItems = $$('.nav-item[data-target]'); const dot = $('.nav-dot');
   const setActive = key => {
     const i = navItems.findIndex(n => n.dataset.target === key); if (i < 0) return;
     dot.style.transform = `translateX(${navItems[i].offsetLeft - 6}px)`;
@@ -583,6 +655,24 @@
   };
   navItems.forEach(n => n.addEventListener('click', e => { e.preventDefault(); goTo(n.dataset.target); }));
   $('.nav-back').addEventListener('click', e => { e.preventDefault(); goTo('study'); });
+
+  /* ---------- Light / dark mode ---------- */
+  const themeBtn = $('.nav-theme'), themeTip = $('.tip', themeBtn);
+  const syncTheme = () => {
+    const dark = document.documentElement.classList.contains('dark');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    themeTip.textContent = dark ? 'Light mode' : 'Dark mode';
+  };
+  themeBtn.addEventListener('click', () => {
+    const flip = () => {
+      const dark = document.documentElement.classList.toggle('dark');
+      try { localStorage.setItem('mw-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      syncTheme(); dispatchEvent(new Event('themechange'));
+    };
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !calm) document.startViewTransition(flip); else flip();
+  });
+  syncTheme();
 
   /* Keyboard: G then H/S/P/E/W */
   let gAt = 0;
@@ -973,6 +1063,8 @@ void main(){
     {n:'Netral',   c:[[.62,.64,.68],[.80,.81,.84],[.98,.98,.98]],g:.9,   sw:'#a7aab0'},
   ];
   let pal = 0;
+  /* dark mode: softer, cooler moonlight */
+  const NIGHT = {n:'Malam', c:[[.16,.38,.70],[.32,.58,.88],[.78,.88,1.]], g:.78};
   const uC1 = gl.getUniformLocation(pr,'C1'), uC2 = gl.getUniformLocation(pr,'C2'), uC3 = gl.getUniformLocation(pr,'C3'), uG = gl.getUniformLocation(pr,'G');
   const setBg = () => {};
   const SCALE = .75; // render at half res; CSS blur hides it and saves battery
@@ -984,7 +1076,7 @@ void main(){
   const draw = now => {
     if (!cv.classList.contains('on')) cv.classList.add('on');
     if (!cv.width || !cv.height) size();
-    gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.uniform1f(uM, mode); const P = PAL[pal]; gl.uniform3fv(uC1, P.c[0]); gl.uniform3fv(uC2, P.c[1]); gl.uniform3fv(uC3, P.c[2]); gl.uniform1f(uG, P.g);
+    gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.uniform1f(uM, mode); const P = document.documentElement.classList.contains('dark') ? NIGHT : PAL[pal]; gl.uniform3fv(uC1, P.c[0]); gl.uniform3fv(uC2, P.c[1]); gl.uniform3fv(uC3, P.c[2]); gl.uniform1f(uG, P.g);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     if (!reduce && visible) raf = requestAnimationFrame(draw);
   };
@@ -993,6 +1085,7 @@ void main(){
   cv.addEventListener('webglcontextlost', e => { e.preventDefault(); cancelAnimationFrame(raf); });
   cv.addEventListener('webglcontextrestored', () => location.reload());
   setBg(0);
+  addEventListener('themechange', () => { if (reduce) draw(performance.now()); });
   draw(performance.now());
 })();
 
@@ -1003,7 +1096,7 @@ void main(){
   if (!gl) return;
   const vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   const fs = `precision highp float;
-uniform vec2 R; uniform float T;
+uniform vec2 R; uniform float T; uniform float D;
 vec2 h2(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return fract(sin(p)*43758.5453);}
 float edge(vec2 x,float t){
   vec2 n=floor(x),f=fract(x); float f1=8.,f2=8.;
@@ -1034,6 +1127,11 @@ void main(){
   vec3 cream=vec3(1.,.995,.97);
   vec3 col=mix(water,cream,k);
   float a=mix(.30+.10*(1.-far),.72,k*.85);
+  if(D>.5){                                      /* dark mode: deep water, moonlit lines */
+    water=mix(vec3(.05,.12,.24),vec3(.03,.09,.19),cell*.6);
+    col=mix(water,vec3(.42,.62,.88),k);
+    a=mix(.16+.06*(1.-far),.34,k*.85);
+  }
   gl_FragColor=vec4(col*a,a);
 }`;
   const sh = (t, src) => { const o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return o; };
@@ -1044,17 +1142,18 @@ void main(){
   const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
   const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const uR = gl.getUniformLocation(pr, 'R'), uT = gl.getUniformLocation(pr, 'T');
+  const uR = gl.getUniformLocation(pr, 'R'), uT = gl.getUniformLocation(pr, 'T'), uD = gl.getUniformLocation(pr, 'D');
   const SCALE = Math.min(window.devicePixelRatio || 1, 2) * .6;
   const size = () => { cv.width = Math.max(1, cv.clientWidth * SCALE | 0); cv.height = Math.max(1, cv.clientHeight * SCALE | 0); gl.viewport(0, 0, cv.width, cv.height); };
   size(); window.addEventListener('resize', size);
   if ('ResizeObserver' in window) new ResizeObserver(() => size()).observe(cv);   /* re-measure when the canvas reappears (e.g. back from a study case) */
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible = false, raf = 0; const t0 = performance.now() - 15000;
-  const draw = now => { if (!cv.classList.contains('on')) cv.classList.add('on'); gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); if (!reduce && visible) raf = requestAnimationFrame(draw); };
+  const draw = now => { if (!cv.classList.contains('on')) cv.classList.add('on'); gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000); gl.uniform1f(uD, document.documentElement.classList.contains('dark') ? 1 : 0); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); if (!reduce && visible) raf = requestAnimationFrame(draw); };
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; cancelAnimationFrame(raf); if (visible) raf = requestAnimationFrame(draw); }).observe(cv);
   cv.addEventListener('webglcontextlost', e => { e.preventDefault(); cancelAnimationFrame(raf); });
   document.addEventListener('visibilitychange', () => { cancelAnimationFrame(raf); if (!document.hidden && visible) raf = requestAnimationFrame(draw); });
+  addEventListener('themechange', () => { if (reduce) draw(performance.now()); });
   draw(performance.now());
 })();
 
