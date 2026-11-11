@@ -12,8 +12,14 @@ Owner: Mirza (product designer, not a developer). Talk to him in Indonesian, pla
 ## How to ship a change (always)
 1. Never push straight to `main` — `main` is the live site.
 2. Make the change on a new branch (e.g. `edit/<short-name>`), commit, push.
-3. Vercel builds a Preview for that branch automatically. Give Mirza the preview link
-   (Vercel → project → Deployments, or `https://mirzawr-portfolio-git-<branch>-mirzawirashalci-9672s-projects.vercel.app`).
+3. Vercel builds a Preview for that branch automatically. Give Mirza the preview link.
+   - Do NOT guess the URL from the branch name: the full name is longer than 63 chars, so Vercel
+     shortens it (e.g. `mirzawr-portfolio-git-cla-2ce283-mirzawirashalci-9672s-projects.vercel.app`)
+     and a guessed link opens a Google search instead.
+   - Get the real link: after pushing, read the commit status
+     (`curl -sS https://api.github.com/repos/mirzawirashalci-git/mirzawr-portfolio/commits/<sha>/status`,
+     context "Vercel"); its `target_url` is the Vercel deployment page. Give Mirza that page and tell him
+     to click **Visit**, or use the first link under "Domains" (the branch link, it updates on every push).
 4. Only after Mirza says it looks good: merge the branch into `main` and push → live on mirzawr.com within ~1 minute.
 5. If something goes wrong live: Vercel → Instant Rollback, or revert the merge commit.
 
