@@ -344,8 +344,10 @@
     --ink:#ecebe9; --ink-2:#dedcd9; --ink-3:#b8b6b2; --muted:#93918d; --muted-2:#a3a19d;
     --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.12); --bg:#0b1728; --bg-rgb:11,23,40;
     --hover:rgba(255,255,255,.05); --chip:rgba(255,255,255,.06); --chip-h:rgba(255,255,255,.11)}
-  html.grad.dark{--bg-rgb:11,23,40}
-  html.grad.dark body{background:linear-gradient(to bottom,#0b1728 0%,#0b1728 18%,#0d1e35 55%,#102744 100%)}
+  html.grad.dark{--bg:#123c6b;--bg-rgb:6,16,32}
+  /* home: blue at the top, sinking to very deep blue at the bottom */
+  html.grad.dark body{background:linear-gradient(to bottom,#123c6b 0%,#0e2f56 18%,#08182f 55%,#030a16 100%)}
+  html.dark .beams::after{background:none}
   html.grad.dark body.on-study{background:#17181a;--bg:#17181a;--bg-rgb:23,24,26}
   /* nav */
   html.dark .nav{background:rgba(30,32,36,.78);box-shadow:0 0 0 1px rgba(255,255,255,.1),0 8px 30px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
@@ -1125,7 +1127,7 @@ void main(){
   vec3 col=mix(water,cream,k);
   float a=mix(.30+.10*(1.-far),.72,k*.85);
   if(D>.5){                                      /* dark mode: deep water, moonlit lines */
-    water=mix(vec3(.09,.19,.34),vec3(.07,.15,.29),cell*.6);
+    water=mix(vec3(.05,.12,.24),vec3(.03,.09,.19),cell*.6);
     col=mix(water,vec3(.42,.62,.88),k);
     a=mix(.16+.06*(1.-far),.34,k*.85);
   }
