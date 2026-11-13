@@ -129,7 +129,7 @@
 (() => {
 'use strict';
 // ---------- setup ----------
-const W = 600, H = 170, GROUND = 150;
+let W = 600; const H = 170, GROUND = 150;
 const INK = '#535353', MID = '#9a9a9a', LIGHT = '#d4d4d4', BG = '#ffffff';
 const cv = document.getElementById('game');
 const ctx = cv.getContext('2d');
@@ -137,6 +137,9 @@ let SC = 1;
 function resize(){
   const r = cv.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
+  // On narrow screens show less of the world at ~1:1 so sprites stay big (like Chrome Dino on phones).
+  if (r.width) W = r.width < 600 ? Math.max(300, Math.round(r.width)) : 600;
+  cv.style.aspectRatio = W + ' / ' + H;
   SC = Math.max(1, Math.ceil((r.width || W) * dpr / W));
   cv.width = W * SC; cv.height = H * SC;
   ctx.imageSmoothingEnabled = false;
