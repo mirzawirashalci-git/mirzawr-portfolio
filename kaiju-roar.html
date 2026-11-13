@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kaiju Roar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
+<meta name="description" content="Kaiju Roar: a one-button pixel runner. Tap Space to jump, hold and release to roar through a city.">
+<style>
+  :root{--ink:#535353;--mute:#777;--bg:#fff}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;justify-content:center}
+  main{width:100%;max-width:940px;padding:40px 20px 32px;text-align:center}
+  h1{font-weight:500;font-size:28px;margin:0 0 10px;letter-spacing:.2px}
+  p.sub{margin:0 auto 26px;max-width:640px;color:#666;line-height:1.55;font-size:16px}
+  canvas{transition:filter 1.4s ease;width:100%;aspect-ratio:600/170;display:block;image-rendering:pixelated;image-rendering:crisp-edges;touch-action:none;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;user-select:none;-webkit-user-select:none}
+  .bar{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px;flex-wrap:wrap}
+  .tip{font-size:12.5px;color:var(--mute)}
+  button{font:inherit;font-size:13.5px;color:var(--ink);background:#f4f4f4;border:1px solid #ddd;border-radius:8px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  button:hover{background:#ececec}
+  .ico-s{width:18px;height:18px}
+  kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;border:1px solid #ccc;border-bottom-width:2px;border-radius:4px;padding:0 5px;background:#fafafa;color:var(--ink)}
+  :root{--card:#fff;--line:#e8e8e8}
+  .controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px;text-align:left}
+  .card{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--card)}
+  .card .ico{flex:0 0 40px;width:40px;height:40px;color:var(--ink)}
+  .card h3{margin:0 0 2px;font-size:14.5px;font-weight:600;color:var(--ink)}
+  .card p{margin:0;font-size:13px;line-height:1.45;color:#666}
+  .levels{max-width:680px;margin:30px auto 0;text-align:left}
+  .levels h2{font-size:16px;font-weight:600;margin:0 0 4px;color:var(--ink)}
+  .levels .hint{margin:0 0 12px;font-size:13.5px;color:var(--mute)}
+  .levels ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+  .levels li{display:flex;gap:14px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.5;color:#555}
+  .levels em{font-style:normal;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--ink);margin-left:4px}
+  .levels b{color:var(--ink);font-weight:600}
+  .chip{flex:0 0 62px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;font-weight:700;letter-spacing:.5px;padding:3px 0;border-radius:5px;border:1.5px solid var(--ink);color:var(--ink)}
+  .chip-max{background:var(--ink);color:var(--card)}
+  .chip-ghost{border-style:dashed;color:var(--mute);border-color:#aaa}
+  @media (max-width:760px){ .controls{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:420px){ .controls{grid-template-columns:1fr} .tip{display:none} }
+  html,body{transition:background-color 1.4s ease,color 1.4s ease}
+  html.night{--card:#0b0b0b;--line:#222;--ink:#cfcfcf;--mute:#8a8a8a}
+  html.night,html.night body{background:#000;color:#b0b0b0}
+  html.night p.sub,html.night .card p,html.night .levels li{color:#9a9a9a}
+  html.night button{background:#151515;border-color:#333;color:#c8c8c8}
+  html.night button:hover{background:#1f1f1f}
+  html.night kbd{background:#111;border-color:#444;color:#c8c8c8}
+  html.night .chip-ghost{border-color:#555}
+  button,kbd,p.sub,.card,.card p,.card h3,.levels li,.chip,h1{transition:background-color 1.4s ease,color 1.4s ease,border-color 1.4s ease}
+  .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 56px}
+  .logo{position:relative;width:56px;height:56px;overflow:hidden;color:var(--ink);flex:0 0 56px}
+  .logo svg{position:absolute;left:-1px;top:7px;width:36px;height:49px}
+  .logo canvas{position:absolute;left:33px;top:6px;height:34px}
+  .brand h1{font-family:'Silkscreen',ui-monospace,monospace;font-weight:400;font-size:42.6px;line-height:1;letter-spacing:0;color:var(--ink);margin:0;text-transform:uppercase}
+  canvas.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+  .howto{display:flex;justify-content:center;align-items:flex-end;gap:95px;margin-top:24px}
+  .how{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .how .art{position:relative;display:block;width:77px;height:54px}
+  .how .art canvas{position:absolute}
+  .how .art i{position:absolute;width:1px;height:8px;background:var(--ink)}
+  .how p{margin:0;font-family:'Silkscreen',ui-monospace,monospace;font-size:13px;line-height:17px;color:var(--ink);text-transform:uppercase;white-space:nowrap}
+  .back{position:fixed;top:40px;left:40px;z-index:10;display:inline-flex;align-items:center;gap:8px;padding:6px 0;
+    font-family:'Silkscreen',ui-monospace,monospace;font-size:14px;line-height:1;color:var(--ink);text-decoration:none;transition:color 1.4s ease}
+  .back svg{width:10px;height:10px;flex:none;shape-rendering:crispEdges;transition:transform .2s ease}
+  .back:hover svg{transform:translateX(-3px)}
+  .back:hover span{text-decoration:underline;text-underline-offset:3px}
+  .back:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+  @media (max-width:640px){
+    .back{position:absolute;top:18px;left:18px;font-size:12px}
+    main{padding-top:64px}
+  }
+  @media (max-width:640px), (pointer:coarse){
+    html,body{min-height:100%;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+  }
+  @media (max-width:640px){
+    #sndLabel{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    #snd{gap:0}
+    .howto{flex-direction:row;align-items:flex-end;gap:clamp(14px,6vw,40px);margin-top:20px}
+    .how .art{transform:scale(.8);transform-origin:50% 100%;margin-top:-10px}
+    .how p{font-size:clamp(8px,2.6vw,11px);line-height:1.3;white-space:nowrap}
+    .brand{margin-bottom:32px}
+    .bar{justify-content:center}
+    .brand h1{font-size:30px}
+    .logo{transform:scale(.8);margin-right:-6px}
+  }
+  html.night canvas.px{filter:invert(1)}
+  html.night .how .art i{background:#acacac}
+</style>
+</head>
+<body>
+<a class="back" href="/#projects" aria-label="Back to mirzawr.com">
+  <svg viewBox="0 0 5 5" aria-hidden="true" fill="currentColor"><rect x="0" y="2" width="5" height="1"/><rect x="1" y="1" width="1" height="3"/><rect x="2" y="0" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/></svg><span>mirzawr.com</span>
+</a>
+<main>
+  <header class="brand">
+    <span class="logo" aria-hidden="true">
+      <svg viewBox="0 0 36 49" width="36" height="49"><path fill-rule="evenodd" fill="currentColor" d="M-5.26225 39.8209L-5.94962 37.7928L-6.63693 35.7656L-7.32431 33.7376L-5.29625 33.0502L-5.98356 31.023L-6.67094 28.9949L-7.35831 26.9669L-5.33026 26.2795L-6.01757 24.2523L-6.70495 22.2242L-7.39232 20.1962L-8.07963 18.169L-6.05157 17.4816L-4.02437 16.7943L-3.337 18.8223L-1.30894 18.135L0.718269 17.4477L0.0317484 15.4195L-0.655624 13.3915L1.37158 12.7042L0.684264 10.677L2.71232 9.98958L2.02495 7.96152L4.05301 7.27415L3.36569 5.24694L5.3929 4.55963L7.42096 3.87226L9.44901 3.18488L11.4762 2.49757L13.5043 1.81019L15.5323 1.12282L16.2189 3.15094L18.2469 2.46356L20.275 1.77619L20.9623 3.80339L22.9895 3.11608L25.0176 2.42956L27.0457 1.74218L27.733 3.76939L29.7602 3.08207L30.4476 5.11013L31.1349 7.13819L31.8223 9.1654L32.5096 11.1935L30.4816 11.8808L28.4544 12.5681L26.4263 13.2555L25.7389 11.2275L23.7109 11.9148L21.6837 12.6021L22.371 14.6302L20.3429 15.3167L21.0303 17.3448L23.0584 16.6574L23.7457 18.6855L25.7729 17.9982L26.4603 20.0262L28.4884 19.3388L29.1757 21.366L29.8631 23.3941L27.835 24.0815L25.8069 24.7689L23.7797 25.4562L23.0924 23.4281L21.0643 24.1155L20.3769 22.0874L18.3497 22.7747L17.6624 20.7475L15.6343 21.4349L13.6063 22.1223L11.579 22.8087L12.2664 24.8368L10.2383 25.5242L10.9257 27.5522L11.613 29.5794L9.58497 30.2668L10.2723 32.2949L12.3004 31.6075L12.9878 33.6356L15.015 32.9482L15.7023 34.9754L16.3897 37.0035L17.077 39.0316L17.7644 41.0588L15.7372 41.7461L13.7091 42.4335L13.0217 40.4054L15.0498 39.7189L14.3625 37.6908L12.3344 38.3782L11.647 36.3501L9.61898 37.0375L10.3064 39.0656L10.9937 41.0928L11.681 43.1208L12.3684 45.1489L10.3412 45.8362L8.31315 46.5236L7.62578 44.4955L9.65384 43.8081L8.96646 41.7801L6.9384 42.4675L6.25109 40.4403L4.22388 41.1276L2.19582 41.8149L2.88314 43.8421L0.855078 44.5295L1.54245 46.5576L-0.485603 47.245L0.20171 49.2722L0.889083 51.3002L-1.13812 51.9875L-3.16618 52.6749L-3.85355 50.6469L-4.54087 48.6196L-5.22824 46.5916L-5.91562 44.5635L-6.60293 42.5363L-4.57487 41.849L-5.26225 39.8209Z"/></svg>
+      <canvas class="px" data-art="logo-wave"></canvas>
+    </span>
+    <h1>Kaiju Roar</h1>
+  </header>
+  <canvas id="game" tabindex="0" aria-label="Kaiju Roar game. Press Space to play."></canvas>
+  <div class="bar">
+    <span class="tip">Click the game first if Space doesn’t respond.</span>
+    <button id="snd" type="button" aria-pressed="true">
+      <svg class="ico-s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-4v12l-4-4H3z" fill="currentColor"/><g id="sndWaves" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M13 7.5a3.5 3.5 0 0 1 0 5"/><path d="M15.5 5a7 7 0 0 1 0 10"/></g><g id="sndOff" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="display:none"><path d="M13 8l4 4M17 8l-4 4"/></g></svg>
+      <span id="sndLabel">Sound</span>
+    </button>
+  </div>
+  <section class="howto" aria-label="Controls">
+    <div class="how how-jump">
+      <span class="art" aria-hidden="true">
+        <canvas class="px" data-art="dino-run" style="left:18px;top:1px;height:41px"></canvas>
+        <i style="left:25px;top:41px"></i><i style="left:32px;top:45px"></i><i style="left:38px;top:45px"></i><i style="left:46px;top:41px"></i>
+      </span>
+      <p data-touch="Tap = Jump">Tap Space = Jump</p>
+    </div>
+    <div class="how how-roar">
+      <span class="art" aria-hidden="true">
+        <canvas class="px" data-art="dino" style="left:3px;top:12px;height:42px"></canvas>
+        <canvas class="px" data-art="wave" style="left:50px;top:6px;height:42px"></canvas>
+      </span>
+      <p data-touch="Hold screen + Release = Roar">Hold Space + Release = Roar</p>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+'use strict';
+// ---------- setup ----------
+let W = 600, DS = 1; const H = 170, GROUND = 150;   // DS = dino scale (1.5 on phones)
+const INK = '#535353', MID = '#9a9a9a', LIGHT = '#d4d4d4', BG = '#ffffff';
+const cv = document.getElementById('game');
+const ctx = cv.getContext('2d');
+let SC = 1;
+function resize(){
+  const r = cv.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  // On narrow screens show less of the world at ~1:1 so sprites stay big (like Chrome Dino on phones).
+  if (r.width) W = r.width < 600 ? Math.max(300, Math.round(r.width)) : 600;
+  cv.style.aspectRatio = W + ' / ' + H;
+  DS = W < 600 ? 1.5 : 1;
+  SC = Math.max(1, Math.ceil((r.width || W) * dpr / W));
+  if (DS !== 1 && SC % 2) SC++;   // keep 1.5x dino pixels on whole device pixels
+  cv.width = W * SC; cv.height = H * SC;
+  ctx.imageSmoothingEnabled = false;
+}
+window.addEventListener('resize', resize);
+
+// ---------- pixel font (5x5) ----------
+const F = {
+A:[".###.","#...#","#####","#...#","#...#"],B:["####.","#...#","####.","#...#","####."],
+C:[".####","#....","#....","#....",".####"],D:["####.","#...#","#...#","#...#","####."],
+E:["#####","#....","####.","#....","#####"],F:["#####","#....","####.","#....","#...."],
+G:[".####","#....","#..##","#...#",".###."],H:["#...#","#...#","#####","#...#","#...#"],
+I:["#####","..#..","..#..","..#..","#####"],J:["..###","...#.","...#.","#..#.",".##.."],
+K:["#...#","#..#.","###..","#..#.","#...#"],L:["#....","#....","#....","#....","#####"],
+M:["#...#","##.##","#.#.#","#...#","#...#"],N:["#...#","##..#","#.#.#","#..##","#...#"],
+O:[".###.","#...#","#...#","#...#",".###."],P:["####.","#...#","####.","#....","#...."],
+Q:[".###.","#...#","#.#.#","#..#.",".##.#"],R:["####.","#...#","####.","#..#.","#...#"],
+S:[".####","#....",".###.","....#","####."],T:["#####","..#..","..#..","..#..","..#.."],
+U:["#...#","#...#","#...#","#...#",".###."],V:["#...#","#...#","#...#",".#.#.","..#.."],
+W:["#...#","#...#","#.#.#","##.##","#...#"],X:["#...#",".#.#.","..#..",".#.#.","#...#"],
+Y:["#...#",".#.#.","..#..","..#..","..#.."],Z:["#####","...#.","..#..",".#...","#####"],
+0:[".###.","#..##","#.#.#","##..#",".###."],1:["..#..",".##..","..#..","..#..",".###."],
+2:["####.","....#",".###.","#....","#####"],3:["####.","....#",".###.","....#","####."],
+4:["#...#","#...#","#####","....#","....#"],5:["#####","#....","####.","....#","####."],
+6:[".###.","#....","####.","#...#",".###."],7:["#####","....#","...#.","..#..","..#.."],
+8:[".###.","#...#",".###.","#...#",".###."],9:[".###.","#...#",".####","....#",".###."],
+'+':[".....","..#..",".###.","..#..","....."],'!':["..#..","..#..","..#..",".....","..#.."],
+'-':[".....",".....","#####",".....","....."],'=':[".....","#####",".....","#####","....."],
+':':[".....","..#..",".....","..#..","....."],'.':[".....",".....",".....",".....","..#.."],
+'/':["....#","...#.","..#..",".#...","#...."]
+};
+function textW(s, sc){ return s.length * 6 * sc - sc; }
+function text(str, x, y, sc, color, align){
+  str = String(str).toUpperCase();
+  const w = textW(str, sc);
+  if (align === 'center') x -= w / 2; else if (align === 'right') x -= w;
+  x = Math.round(x); y = Math.round(y);
+  ctx.fillStyle = color;
+  for (let n = 0; n < str.length; n++){
+    const g = F[str[n]];
+    if (!g) continue;
+    for (let j = 0; j < 5; j++) for (let i = 0; i < 5; i++)
+      if (g[j][i] === '#') ctx.fillRect(x + (n * 6 + i) * sc, y + j * sc, sc, sc);
+  }
+}
+
+// ---------- sprites ----------
+const REX = [
+"...........................#................",
+"...........................##...............",
+"...........................#s#..............",
+"............................####.###........",
+"...........................#oooo##ss#.......",
+"..........................#oosssoo#######...",
+".........................#soos##soooooooo#..",
+"........................#soooo.#oooooos#oo#.",
+"........................#soooooooooooooooo#.",
+".......................#ssoooooooooooooooo#.",
+".......................#sooooooooooooooooo#.",
+".......................#ssoooooooooooooooo#.",
+".......................#ssoooooooooooooooo#.",
+"....................#..#sooooos###########..",
+"................#...##.#sso#oooooooooooo#...",
+"................##..#o##soos#ooooooooo##....",
+"................#s#.#o#soooos########.......",
+"................#so#oo#sooooss#.............",
+"............#...#ooo##ssooooolll#...........",
+"............##..#so#sssssoooohl#............",
+"............#o#.#o#sssoossooohh#............",
+"............#so###sssooooooohhh#............",
+"...#........#so#ssssssoooooohhh#............",
+"#..##...#...#o#ssssoossooo#ohhh#............",
+"##.#o#..##..##ssosssoos#oo#hhhh####.........",
+"#s#soo#.#o#.#sssoosssoos#o####h#sss#........",
+"#s##soo#soo#sooosooosooo#ooooo####s#........",
+"#sss##soo##ooosoosoooooos####o#..###........",
+"#ssooo###oooosooooo#ooooohll###.............",
+".#ssoooooooossoooooo#ooohhhhll#.............",
+".#lssooooooo#sooooooo#ohhhhhh#..............",
+"..#lsssoooos#sooooooo#hhhhhhl#..............",
+"...#lsssssss#sooooooo#hhhhhl#...............",
+"....#lllssss#ssoooooo#lhhhl##...............",
+".....###llll#ssoooooo#llll#s#...............",
+"........##lll#ssooooo#lll#ss#...............",
+"..........####ssoooo#ll##sss#...............",
+".............#soooos####ssss#...............",
+"............#ssooss#..#ssss#................",
+"...........#sssss##..#ssss#.................",
+"...........#sos#....#sss#...................",
+"...........#sos#....#sss#...................",
+"...........#soo#.....#sso#..................",
+"...........#ssoo##...#ssoo##................",
+"...........#ss#ooo#..#sssooo#...............",
+"...........#ss.#.#.#..#ss#.#.#..............",
+"............#######...########..............",
+];
+const REX_ROAR = [ // roar pose: head and neck pushed forward and down
+"................................................",
+"................................................",
+"................................................",
+"................................................",
+"................................#...............",
+"................................##..............",
+"................................#s#.............",
+".................................####.###...###.",
+"................................#oooo##ss###ooo#",
+"...............................#oosssoo###ooo#o#",
+"..............................#soos##sooooooooo#",
+".............................#soooo.#oooooooooo#",
+".............................#soooooooooooooooo#",
+"............................#ssoooooooooooooo##.",
+"............................#sooooooooooooo##o..",
+"............................#ssooooooooo###o##..",
+"............................#ssooooooo###o####..",
+".........................#..#sooooos###o######..",
+".....................#...##.#sso#ooo##o#######..",
+".....................##..#o##soos#oooo##o#####..",
+".....................#s#.#o#soooos##ooso##o###..",
+"....................#so#oo#sooooss####sso##o#...",
+"...#...........##..#so#sssssoooohl#....#####....",
+"#..##...#......#o#.#o#sssoossooohh#.............",
+"##.#o#..##.....#so###sssooooooohhh#.............",
+"#s#soo#.#o#...#o#ssssoossooo#ohhh#..............",
+"#s##soo#so##..##ssosssoos#oo#hhhh####...........",
+"#sss##soo##o#.#sssoosssoos#o####h#sss#..........",
+"#ssooo###osoo#sooosooosooo#ooooo####s#..........",
+".#ssoooooooooosooooo#ooooohll###................",
+".#lssoooooooossoooooo#ooohhhhll#................",
+"..#lsssoooooo#sooooooo#ohhhhhh#.................",
+"...#lsssssss#sooooooo#hhhhhl#...................",
+"....#lllssss#ssoooooo#lhhhl##...................",
+".....###llll#ssoooooo#llll#s#...................",
+"........##lll#ssooooo#lll#ss#...................",
+"..........####ssoooo#ll##sss#...................",
+".............#soooos####ssss#...................",
+"............#ssooss#..#ssss#....................",
+"...........#sssss##..#ssss#.....................",
+"...........#sos#....#sss#.......................",
+"...........#sos#....#sss#.......................",
+"...........#soo#.....#sso#......................",
+"...........#ssoo##...#ssoo##....................",
+"...........#ss#ooo#..#sssooo#...................",
+"...........#ss.#.#.#..#ss#.#.#..................",
+"............#######...########..................",
+];
+const REX_DEAD = [
+"...........................#................",
+"...........................##...............",
+"...........................#s#..............",
+"............................####.###........",
+"...........................#oooo##ss#.......",
+"..........................#oosssoo#######...",
+".........................#soos#o#oooooooo#..",
+"........................#sooooo#oooooos#oo#.",
+"........................#soooo#o#ooooooooo#.",
+".......................#ssoooooooooooooooo#.",
+".......................#sooooooooooooooooo#.",
+".......................#ssoooooooooooooooo#.",
+".......................#ssoooooooooooooooo#.",
+"....................#..#sooooos###########..",
+"................#...##.#sso#oooooooooooo#...",
+"................##..#o##soos#ooooooooo##....",
+"................#s#.#o#soooos########.......",
+"................#so#oo#sooooss#.............",
+"............#...#ooo##ssooooolll#...........",
+"............##..#so#sssssoooohl#............",
+"............#o#.#o#sssoossooohh#............",
+"............#so###sssooooooohhh#............",
+"...#........#so#ssssssoooooohhh#............",
+"#..##...#...#o#ssssoossooo#ohhh#............",
+"##.#o#..##..##ssosssoos#oo#hhhh####.........",
+"#s#soo#.#o#.#sssoosssoos#o####h#sss#........",
+"#s##soo#soo#sooosooosooo#ooooo####s#........",
+"#sss##soo##ooosoosoooooos####o#..###........",
+"#ssooo###oooosooooo#ooooohll###.............",
+".#ssoooooooossoooooo#ooohhhhll#.............",
+".#lssooooooo#sooooooo#ohhhhhh#..............",
+"..#lsssoooos#sooooooo#hhhhhhl#..............",
+"...#lsssssss#sooooooo#hhhhhl#...............",
+"....#lllssss#ssoooooo#lhhhl##...............",
+".....###llll#ssoooooo#llll#s#...............",
+"........##lll#ssooooo#lll#ss#...............",
+"..........####ssoooo#ll##sss#...............",
+".............#soooos####ssss#...............",
+"............#ssooss#..#ssss#................",
+"...........#sssss##..#ssss#.................",
+"...........#sos#....#sss#...................",
+"...........#sos#....#sss#...................",
+"...........#soo#.....#sso#..................",
+"...........#ssoo##...#ssoo##................",
+"...........#ss#ooo#..#sssooo#...............",
+"...........#ss.#.#.#..#ss#.#.#..............",
+"............#######...########..............",
+];
+// left leg = cols 11-19, right leg = cols 20-29 (legs start at row 40)
+function liftLeg(src, a, b, dy){
+  const g = src.map(r => r.split(''));
+  for (let r = 40; r < g.length; r++) for (let c = a; c <= b; c++) g[r][c] = r + dy < src.length ? src[r + dy][c] : '.';
+  return g.map(r => r.join(''));
+}
+const DINO_STAND = REX;
+const DINO_RUN1 = liftLeg(REX, 11, 19, 2);
+const DINO_RUN2 = liftLeg(REX, 20, 29, 2);
+const DINO_ROAR = REX_ROAR;
+const DINO_DEAD = REX_DEAD;
+const DINO_H = REX.length;
+const REX_COLORS = { '#': INK, 's': '#a6a6a6', 'l': '#e4e4e4', 'o': '#ffffff', 'h': '#ffffff' };
+function sprMulti(rows, x, y, p, cmap){
+  x = Math.round(x); y = Math.round(y);
+  for (let j = 0; j < rows.length; j++){
+    const r = rows[j]; let i = 0;
+    while (i < r.length){
+      const ch = r[i], col = cmap[ch];
+      if (!col){ i++; continue; }
+      let k = i; while (k < r.length && r[k] === ch) k++;
+      ctx.fillStyle = col; ctx.fillRect(x + i * p, y + j * p, (k - i) * p, p); i = k;
+    }
+  }
+}
+
+// clouds from the Figma "Cloud" frame (small, large, medium); d = outline, a/c/b = fill tones
+const CLOUD_SHAPES = [
+[".....dddd.........","....dcccbd.ddd....","...dabbbbcdccbd...",".ddbcabbbbcabbbd..","dcbbbcacbbcabbcbd.","dcbbbcacbbabbbbcbd","dccccccccccccccccd",".dddddddddddddddd."],
+["..............ddd..................",".............dccbd.................",".......ddd.ddbbbbbd....dd..........","......dcbcdbbbbbcbd...dccd.ddd.....",".....dcbbbbabccccbbdddbbbbdcccd....",".....dcbbbbabbbcbbcbbbbbbabbbbcd...","......dbbbabbbbbbbcbbbbcbabbbbcd...","...dddbbbbbbbccbbbbbbbbbccaccbbbdd.","..dbbbbccccccccccccccccccccccccbbbd","dddddddddddddddddddddddddddddddddd."],
+["..............ddddd.........",".............dbccccd........","............dbccbbbcd.......","...........dbbbbcbbbcddd....","........dddbbbbbbbbbaccbd...","..ddd..dccbabbbbbbbacbbbcd..",".dccbddbbbbcabbbbbbacbbbbcd.","dcbbbbabbbbcabcccbbbabccbbcd","dccccccccccccccccccccccccccd",".dddddddddddddddddddddddddd."],
+];
+const CLOUD_COLORS = { 'd': '#c4c4c4', 'a': '#e2e2e2', 'c': '#efefef', 'b': '#ffffff' };
+const CLOUD = [
+"..........######.........",
+"........##......##.......",
+"....####..........#......",
+"...#...............###...",
+".##...................#..",
+"#......................#.",
+"#########################",
+];
+
+
+// ---- obstacle sprites, same style as the T-Rex: black outline, white fill, grey shading ----
+function mask(w, h){ return Array.from({ length: h }, () => Array(w).fill(0)); }
+function mRect(m, x, y, w, h){ for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) if (m[j] && i >= 0 && i < m[j].length) m[j][i] = 1; }
+function mEll(m, cx, cy, rx, ry){
+  for (let j = 0; j < m.length; j++) for (let i = 0; i < m[0].length; i++)
+    if (((i + .5 - cx) / rx) ** 2 + ((j + .5 - cy) / ry) ** 2 <= 1) m[j][i] = 1;
+}
+function mPoly(m, pts){
+  for (let j = 0; j < m.length; j++) for (let i = 0; i < m[0].length; i++){
+    const x = i + .5, y = j + .5; let inside = false;
+    for (let k = 0, l = pts.length - 1; k < pts.length; l = k++){
+      const [xi, yi] = pts[k], [xl, yl] = pts[l];
+      if ((yi > y) !== (yl > y) && x < (xl - xi) * (y - yi) / (yl - yi) + xi) inside = !inside;
+    }
+    if (inside) m[j][i] = 1;
+  }
+}
+function stylize(m){
+  const h = m.length, w = m[0].length;
+  const on = (i, j) => j >= 0 && j < h && i >= 0 && i < w && m[j][i] === 1;
+  const g = mask(w, h).map(r => r.map(() => '.'));
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++){
+    if (!on(i, j)) continue;
+    if (!on(i - 1, j) || !on(i + 1, j) || !on(i, j - 1) || !on(i, j + 1)) g[j][i] = '#';
+    else if (!on(i - 2, j) || !on(i - 3, j) || !on(i, j + 2)) g[j][i] = 's';
+    else g[j][i] = 'o';
+  }
+  return g;
+}
+const toRows = g => g.map(r => r.join(''));
+
+function makeCactus(k){
+  const S = v => Math.round(v * k);
+  const w = S(22) + 2, h = S(34);
+  const m = mask(w, h), o = 1;
+  // trunk
+  mRect(m, o + S(7), S(4), S(8), h - S(4)); mEll(m, o + S(11), S(4.5), S(4), S(4));
+  // left arm (vertical + elbow into trunk)
+  mRect(m, o + S(1), S(10), S(4), S(10)); mEll(m, o + S(3), S(10.5), S(2), S(2.5));
+  mRect(m, o + S(1), S(17), S(7), S(4)); mEll(m, o + S(3.5), S(19), S(2.5), S(2.2));
+  // right arm
+  mRect(m, o + S(17), S(7), S(4), S(10)); mEll(m, o + S(19), S(7.5), S(2), S(2.5));
+  mRect(m, o + S(14), S(14), S(7), S(4)); mEll(m, o + S(18.5), S(16), S(2.5), S(2.2));
+  const g = stylize(m);
+  // ribs on the trunk
+  for (const cx of [o + S(10), o + S(12)]) for (let j = S(6); j < h - 2; j++) if (g[j][cx] === 'o') g[j][cx] = 's';
+  // spikes
+  for (let j = 2; j < h - 2; j += 4) for (let i = 1; i < w - 1; i++){
+    if (g[j][i] === '#' && g[j][i - 1] === '.' && (g[j][i + 1] === 's' || g[j][i + 1] === 'o')) g[j][i - 1] = '#';
+    if (g[j][i] === '#' && g[j][i + 1] === '.' && (g[j][i - 1] === 's' || g[j][i - 1] === 'o')) g[j][i + 1] = '#';
+  }
+  return toRows(g);
+}
+function makePtero(up){
+  const m = mask(40, 30);
+  mEll(m, 21, 16, 10, 4.2);                          // body
+  mEll(m, 9.5, 13, 4.6, 3.8);                        // head
+  mPoly(m, [[11, 11], [18, 12.5], [18, 19.5], [11, 16]]); // neck
+  mPoly(m, [[6, 11.5], [0, 15.5], [7.5, 16]]);       // beak
+  mPoly(m, [[10, 10.5], [19.5, 6], [14, 12.5]]);     // crest
+  mPoly(m, [[29, 14], [39, 17], [29, 18.5]]);        // tail
+  mRect(m, 22, 19, 2, 3); mRect(m, 26, 19, 2, 3);    // feet
+  if (up) mPoly(m, [[13, 15], [20, 0], [26, 0], [30, 15]]);
+  else    mPoly(m, [[13, 17], [20, 29.5], [26, 29.5], [30, 17]]);
+  const g = stylize(m);
+  // wing finger line
+  if (up) { for (let j = 3; j < 13; j++){ const i = Math.round(21 + (13 - j) * 0.05); if (g[j][i] === 'o' || g[j][i] === 's') g[j][i] = 's'; } }
+  else    { for (let j = 19; j < 28; j++){ const i = 22; if (g[j][i] === 'o') g[j][i] = 's'; } }
+  g[12][9] = '#'; g[12][10] = '#'; g[11][9] = '#';   // eye
+  return toRows(g);
+}
+function mBoulder(m, cx, cy, rx, ry, n, rnd){
+  const pts = [];
+  for (let k = 0; k < n; k++){
+    const a = (k / n) * Math.PI * 2 + rnd() * 0.25;
+    const r = 0.84 + rnd() * 0.18;
+    pts.push([cx + Math.cos(a) * rx * r, cy + Math.sin(a) * ry * r]);
+  }
+  mPoly(m, pts);
+}
+function mBlob(m, x, y, r){ mEll(m, x, y, r, r); }
+function tentacle(m, pts, r0, r1, path){
+  // quadratic/cubic-ish curve through control points, drawn as tapering circles
+  const seg = pts.length - 1, N = 60;
+  for (let n = 0; n <= N; n++){
+    const t = n / N, k = Math.min(seg - 1, Math.floor(t * seg)), u = t * seg - k;
+    const [ax, ay] = pts[k], [bx, by] = pts[k + 1];
+    const pa = pts[Math.max(0, k - 1)], pb = pts[Math.min(seg, k + 2)];
+    // Catmull-Rom
+    const cr = (p0, p1, p2, p3) => 0.5 * ((2 * p1) + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
+    const x = cr(pa[0], ax, bx, pb[0]), y = cr(pa[1], ay, by, pb[1]);
+    const r = r0 + (r1 - r0) * t;
+    mBlob(m, x, y, r);
+    if (path && n % 6 === 3 && r > 1.6) path.push([Math.floor(x), Math.floor(y)]);
+  }
+}
+function makeOctopus(phase){
+  const w = 62, h = 104, m = mask(w, h);
+  const p = phase ? 2 : -2, suck = [];
+  mEll(m, 31, 24, 15.5, 22);          // mantle
+  mEll(m, 31, 50, 16, 10);            // head / eye band
+  // raised tentacles
+  tentacle(m, [[19, 50], [9, 38], [5, 22 + p], [10, 12], [14, 16 - p]], 4.2, 1.2, suck);
+  tentacle(m, [[43, 50], [53, 36], [57, 20 - p], [52, 9], [48, 13 + p]], 4.2, 1.2, suck);
+  // tentacles on the ground
+  tentacle(m, [[22, 56], [12, 70], [7, 86 + p], [4, 100], [9, 97]], 4.5, 1.6, suck);
+  tentacle(m, [[27, 58], [24, 78], [19, 93 - p], [16, 101]], 4.5, 2.2, suck);
+  tentacle(m, [[35, 58], [38, 78], [43, 93 + p], [46, 101]], 4.5, 2.2, suck);
+  tentacle(m, [[40, 56], [50, 70], [55, 86 - p], [58, 100], [53, 97]], 4.5, 1.6, suck);
+  const g = stylize(m);
+  const put = (x, y, c) => { if (g[y] && x >= 0 && x < w && g[y][x] !== '.') g[y][x] = c; };
+  // suckers along the tentacles
+  for (const [x, y] of suck){ put(x, y, 's'); put(x + 1, y, 's'); }
+  // spots on the mantle
+  for (const [x, y, r] of [[25, 14, 1.6], [36, 10, 1.3], [38, 24, 1.8], [27, 30, 1.4], [33, 36, 1.2], [22, 22, 1.1]])
+    for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) if (i * i + j * j <= r * r) put(x + i, y + j, 's');
+  // eyes: big white ball, dark ring, thick horizontal pupil, angry brow
+  for (const ex of [24, 38]){
+    for (let j = -4; j <= 4; j++) for (let i = -5; i <= 5; i++){
+      const d = (i / 5.2) ** 2 + (j / 4.2) ** 2;
+      if (d <= 1) put(ex + i, 49 + j, d > 0.55 ? '#' : 'o');
+    }
+    for (let i = -2; i <= 2; i++){ put(ex + i, 49, '#'); put(ex + i, 50, '#'); }
+  }
+  for (let i = 0; i < 8; i++){
+    const y = 41 + Math.floor(i / 2);
+    put(17 + i, y, '#'); put(17 + i, y + 1, '#');
+    put(45 - i, y, '#'); put(45 - i, y + 1, '#');
+  }
+  // wide mouth full of sharp teeth
+  const mtop = {}, mbot = {};
+  for (let j = 51; j <= 62; j++) for (let i = 19; i <= 43; i++){
+    if ((i + .5 - 31) ** 2 / 11 ** 2 + (j + .5 - 57) ** 2 / 4.8 ** 2 <= 1){
+      put(i, j, '#');
+      if (mtop[i] === undefined) mtop[i] = j;
+      mbot[i] = j;
+    }
+  }
+  for (const x of [24, 27, 30, 33, 36, 39]) if (mtop[x] !== undefined){   // upper fangs
+    const y = mtop[x] + 1;
+    put(x - 1, y, 'o'); put(x, y, 'o'); put(x + 1, y, 'o'); put(x, y + 1, 'o');
+    if (x === 27 || x === 36) put(x, y + 2, 'o');                         // long fangs
+  }
+  for (const x of [25, 28, 31, 34, 37]) if (mbot[x] !== undefined){       // lower fangs
+    const y = mbot[x] - 1;
+    put(x - 1, y, 'o'); put(x, y, 'o'); put(x + 1, y, 'o'); put(x, y - 1, 'o');
+  }
+  return toRows(g);
+}
+// Sailback boss: from the Figma design (Layer_1), drawn at 1.5x, flipped to face the dino, T-Rex palette
+const OCTO_ART = [
+"..................................................................###....................................................................................................",
+"..................................................................#o#....................................................................................................",
+".................................................................#oo#..####..............................................................................................",
+"...............................................................##oooo##ooo#...#####......................................................................................",
+"...............................................................#oooo#ooooo#...#oo##......................................................................................",
+"..............................................................#ooooosooooo#..#oooo#......................................................................................",
+"............................................................##oooooosoooooo##ooooo#......................................................................................",
+"............................................................#ooooooosooooo#ooooooo#......................................................................................",
+".........................................................###ssoooooosooooosooooooo#.#####................................................................................",
+"........................................................#ooossoooooosooooosoooooo###oooo#................................................................................",
+"........................................................#ooossoooooosooooosoooooo##ooooo#................................................................................",
+"...................................................#####oooossoooooosooooosooooosooooooo#................................................................................",
+"..................................................#ooooooooossoooooosooooosooooosooooooo#.######.........................................................................",
+"..................................................#ooo#ooooossoooooosooooosooooosooooooo#.#oooo#.........................................................................",
+"..................................................#ooo#ooooossoooooosooooosooooosoooooo#s#ooooo#.........................................................................",
+"................................................##oooossoooossoooooosooooosooooosoooooossoooooo#.........................................................................",
+"................................................#ooooossoooossoooooosooooosooooosoooooossoooooo#.........................................................................",
+"................................................#ooooossoooossoooooosooooosoooss#oooooossoooooo#.........................................................................",
+"................................................#ooooooosooossoooossoooo#ssooossoooooosoooooooo#.........................................................................",
+"................................................#ooooooosooossoooossoooosssooossoooooosoooooooo#.........................................................................",
+"...............................................#o#oooooosoooss#ooossoooossoooossoooooosooooos##o###......................................................................",
+".............................................##ooosooooosooooosooossoooossoooossoooooosooooosooooo#......................................................................",
+".............................................#oooosooooosooooosooossoooossoooossoooooosooooosooooo#......................................................................",
+".............................................#oooosooooosooooosooossoooossoooossoooossoooossoooooo#......................................................................",
+".............................................#ooooossooosooooosooossoooosslooossoooossoooossoooooo#......................................................................",
+".............................................#ooooossooosooooosooossoooosslooossoooossoooossoooooo#......................................................................",
+".............................................#ooooossoooossooosooossooolsslllsssooosooooosoooooosss###...................................................................",
+".............................................#ooooooosooossloosoolssllllsslllsllloosooooosooooosooooo#...................................................................",
+".............................................#ooooooosooossloosoolssllllsslllsllloosooooosooooosooooo#...................................................................",
+"............................................#oosooollsoolsslllslllssllllsslllslllllsllossoooossooooo#....................................................................",
+"............................................#oosooollooolsslllslllssllllsslllslllssllllssoooosslllsoo###.................................................................",
+"............................................#oosooollooolsslllslllssllllsslllslllssllllssoooosslllsooo##.................................................................",
+"............................................#ooossooolsslllsllslllssl###ssl#sslll#llll#llollslllssoooo##.................................................................",
+"............................................#oollllooossooosoosooo###oo####oo####oo###o#oo#oooosoolll#...................................................................",
+"............................................#oollllooossooosoosooooo#oo#oo#ooooo#oooo#o#ooooooosoolll#...................................................................",
+"..........................................##llllllsooooosoosoo####ooooooooooooooooooooo###oo###ooolllo##.................................................................",
+"..........................................#oollloosooooosoo###oooooooooooooooooooooooooooooo######olloo#.................................................................",
+"..........................................#oollloosooooosoooo#oooooooooooooooooooooooooooooo###o##olloo#.................................................................",
+"..........................................##olllooossooo###oooooooooooooooooooooooooooooooooo#oo#oooo#l#.................................................................",
+"............................................#llsooosso#ooooooooooooooooolloooooooooooooooooooooo#oo#ooll#................................................................",
+"............................................#llsooossooooooooooooooooooolloooooooooooooooooooooo#oooooll#................................................................",
+"...........................###..###.........#llossooo#oooooooooooolloooollllloooooooooooooooooo####oolll#................................................................",
+".......................####ooo##ooo#......##o#ooss###ooooooooooooollllllllllllllolllllllllooolloooo#ooo#.................................................................",
+".......................#lloooooo#oo#......#ooooossoo#ooooooooooooollllllllllllllolllllllllooolloooooooo#.................................................................",
+"..................#####sllollooooooo##....#oooo###ooooooooooooollllllllllllsslssssslllllllllllloooooo###.................................................................",
+"...............###ssssssssssslllooo#oo#..###o#oooooooooooooooolllllllllllllssssslooooooooollslllooooooo#.................................................................",
+"...............#lsssssssssssslllooo#oo#..###oooooooooooooooooolllllllllllllssssslooooooooollslllooooooo#.................................................................",
+"............###lllsssss####sssssollo#oo##o###ooolloooooooooollllllllllllllsssssslooooooooooolsslllollloo###..............................................................",
+"..##########lllllllll#oo#ssllllllllooooooo#oossllloooooolooollllllllllllllsssslloooooooooooolsslllllllllooo#.............................................................",
+"..#llllllllllllllllllloo#sslllllllloooo#oo#oossllloooooolooollllllllllllllsssslloooooooooooolsslllllllllooo#.............................................................",
+"##lllllllllllllllllllllslllllllllllllloooooossslooloooooollllllllllllsssllssssllooooooooooooossllloooolll##o##...........................................................",
+"#sslllss####ssllls########lsslllslllllollloosll#ooooooooollsllllllsslssssssss#llooooooooooooo#lllllllooolllooo#..........................................................",
+"##slllsssll#sslllssslllll#lsslllslllllolllooslloooooooooollsllllllsslssssssss#llooooooooooooo#lllllllooolllooo#..........................................................",
+"..#l####slll######sslllllllllsllsllllllllloos#ooooooooooollsllllllsssssssssss#llooooooooooool#llllllllooolll#l#..###.....................................................",
+"..#llllllllllllllllllllllllllsssslllsslllllls#oooooooooolss#sslssssssssssssss#oooooooooooooo#sssllllllllooollll##ooo#....................................................",
+"..#llllllllllllllllllllllllllsssslllsslllllls#oooooooooolssssslssssssssssssss#oooooooooooooo#sssllllllllooollllll#oo#....................................................",
+"...########slllllllllllllll#ssssslllssllllss#ooooooooolls#sssssssssssssssss#lloooooooooooooo#ssssslssllllooooolllooo#...###..............................................",
+"...........#lllllsssllllss#sssssssssllslllss#oooooolllll#ssssssssssssssssss#ooooooooooooooll#ssssssssllllllooooooolll###oo#..###.........................................",
+"...........#######ssllllssssssssssssllslllss#oooooolllll#ssssssssssssssssss#ooooooooooooooll#sssssssslllllloooooooll#llooo#..###.........................................",
+"..................########ssssssssssssssssss#oooooosss###sssssssssssssss#ss#oooooooooooool#####ssssssllllllloooooollllllooo##oo#...###...................................",
+"..........................#ssssssssssssssssss#llooooooool#ssssssssssssss#####ooooooollllll#ss###sssssslllllllllooooooooolllooo#####oo#....###.....###....................",
+"..........................###ssssssssssssssssslloooooooollsssssssssssssss####ooooooolllllllss###sssssslllllllllooooooooolllooo##loooo#....#o#.....###....................",
+".............................####ssssssssssssss#lloooooooll#sssssssssss######loooooolllll###ssss#ssssssslllllllllloooooooolllllllooo#l####oo#...##oo#....###.............",
+".................................#sssss##sssssss#llllollllll#sssssssss#....#llooolllll#l#...#sssss#ssssslsslllllllllooooooooooooolllllllloooo###ooo######ooo##.#####.....",
+".................................########ssssssssllllollllll#sssssss###....#llooollllll##...###ssssssssslsslllllllllooooooooooooollllllllooo#lloooo##lllooooo#.#oo##.....",
+".......................................#s######sss#sssssllll#ssss###.......##loooooollll#......#sss#sssssssllllllllllllooooooooooooooollllllllllllllllllooo##o#ooo##.....",
+"....................................###sssssssssss###slllll###ss#............#llooooooll#.......#ss###sssssllllllllllllllloooollooooooooooooooooooooolllllloooooo#..####.",
+"....................................#ssssssssss######sllllll#####............#llooooooll#.......#####ssssssllllllllllllllloooollooooooooooooooooooooolllllloooooo#..#oo#.",
+"...................................#sssssssss##....#lllllll#..................##lllllllll#.........###s##ssssslllllllllllllllllloooooooooooooooooooooooooooooooooo##oooo#",
+".................................##sssssssss#......#llllll#.....................#lllllllll##..........######sssssllllllllllllllllllooolooooolooooooooooooooooooooollooo#.",
+".................................#sssss######......#llllll#.....................#llllllllll#..........###ss#sssssllllllllllllllllllooolooooolooooooooooooooooooooollooo#.",
+".................................#ssss#............#llllll#......................##lllllllll#...........#ss####sssllssslllllllllllllllllllllllllllllloooollooooooolls#o#.",
+"...........................######ssss#.............#llllll#........................#lllllllll##..........#sssss###sssssssslssslllllllllllllllllllllllllllllloooooolllooo#",
+"...........................###ssssss##.............#lllll##........................#llllllllll#..........#sssss##ssssssssslssslllllllllllllllllllllllllllllloooooolllooo#",
+"..........................####sssss#..............#lllll#...........................##lllllllll#.........##ssss######ssssssssssssllsssssssllllllllllllllllllllllllllsss#.",
+"........................#########s#...............#lllll#.............................#llllllll#...........#ssss#....#ssssssssssssssssssssssssssssslllllllllllllllsssooo#",
+"........................###########...............#lllll#.............................#llllllll#...........#ssss#....######sssssssssssssssssssssssslllllllllllllllsssooo#",
+"........................###..####.................#llll#..............................#llllll##............#ssss#..........##############################################",
+"..........................................#####.##lllll#............................##llllll#...........###sssss#........................................................",
+"..........................................#####.#l#llll#............................#lllllll#...........#ssssss##........................................................",
+".........................................#####l#llllll##......................######llllll##.........###ssssss#..........................................................",
+".........................................###lllllllll#.......................###lllllllll#.........#####sssss#...........................................................",
+".........................................#############.......................###lllllllll#.........###########...........................................................",
+"...........................................................................##############................................................................................",
+];
+const OCTO = [OCTO_ART, OCTO_ART];
+function makeRock(){
+  const w = 58, h = 104, m = mask(w, h);
+  let sd = 23; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  mBoulder(m, 29, 84, 30, 22, 11, rnd);
+  mBoulder(m, 26, 52, 25, 19, 10, rnd);
+  mBoulder(m, 32, 22, 21, 17, 9, rnd);
+  mBoulder(m, 18, 30, 11, 9, 7, rnd);   // side chunk
+  const g = stylize(m);
+  // seams
+  const seam = (y0, y1) => { for (let i = 2; i < w - 2; i++){ const y = Math.round(y0 + (y1 - y0) * i / w); if (g[y] && (g[y][i] === 'o' || g[y][i] === 's')) g[y][i] = '#'; } };
+  seam(64, 68); seam(37, 34);
+  // wider shadow band on the left + under seams
+  for (let j = 0; j < h; j++){ let seen = 0; for (let i = 0; i < w; i++){ if (g[j][i] !== '.') seen++; if (seen > 1 && seen < 7 && g[j][i] === 'o') g[j][i] = 's'; } }
+  for (let j = 1; j < h; j++) for (let i = 0; i < w; i++) if (g[j][i] === 'o' && g[j - 1][i] === '#' && rnd() < 0.8) g[j][i] = 's';
+  // cracks
+  for (let n = 0; n < 9; n++){
+    let x = 10 + Math.floor(rnd() * 38), y = 6 + Math.floor(rnd() * 90);
+    for (let k = 0; k < 6; k++){
+      if (g[y] && (g[y][x] === 'o' || g[y][x] === 's')) g[y][x] = '#';
+      x += rnd() < .5 ? 1 : -1; y += 1;
+    }
+  }
+  // texture specks
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) if (g[j][i] === 'o' && rnd() < 0.06) g[j][i] = 's';
+  return toRows(g);
+}
+function makeShop(seed){
+  const w = 28, h = 31, m = mask(w, h);
+  mRect(m, 1, 8, 26, 23);                      // body
+  mRect(m, 0, 10, 28, 5);                      // awning
+  for (let x = 0; x < 28; x += 4) mEll(m, x + 2, 15, 2, 1.6);   // scalloped edge
+  const g = stylize(m);
+  const put = (x, y, c) => { if (g[y] && x >= 0 && x < w) g[y][x] = c; };
+  // awning stripes
+  for (let y = 11; y <= 15; y++) for (let x = 1; x < w - 1; x++) if (g[y][x] !== '#' && g[y][x] !== '.') g[y][x] = Math.floor((x - 1) / 2) % 2 ? 'o' : 's';
+  for (let x = 1; x < w - 1; x++) if (g[16] && g[16][x] === 'o') g[16][x] = 's';
+  // display window with goods on shelves
+  for (let y = 18; y <= 27; y++) for (let x = 3; x <= 15; x++){
+    const edge = y === 18 || y === 27 || x === 3 || x === 15;
+    put(x, y, edge ? '#' : 'l');
+  }
+  for (let x = 4; x <= 14; x++) put(x, 22, '#');                 // shelf
+  for (const [x, y, ww, hh] of [[5, 20, 2, 2], [8, 19, 2, 3], [11, 20, 3, 2], [5, 24, 3, 3], [10, 25, 2, 2], [13, 24, 1, 3]])
+    for (let j = 0; j < hh; j++) for (let i = 0; i < ww; i++) put(x + i, y + j, 's');
+  // door with glass + knob
+  for (let y = 18; y <= 29; y++) for (let x = 18; x <= 24; x++){
+    const edge = y === 18 || x === 18 || x === 24;
+    put(x, y, edge ? '#' : (y >= 20 && y <= 23 && x >= 20 && x <= 22 ? 'l' : 's'));
+  }
+  put(19, 25, '#'); put(23, 25, '#');
+  // doorstep
+  for (let x = 17; x <= 25; x++) put(x, 30, '#');
+  return toRows(g).filter((r, j, all) => j >= all.findIndex(q => /[^.]/.test(q)));
+}
+function makeBuilding(kind, seed){
+  let sd = seed; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  let w, h, m, win;
+  if (kind === 'shop'){
+    w = 24; h = 28; m = mask(w, h);
+    mRect(m, 1, 7, 22, 21); mRect(m, 0, 5, 24, 3);           // body + roof ledge
+    win = { x0: 4, y0: 10, dx: 6, dy: 6, ww: 3, wh: 3, rows: 1 };
+  } else if (kind === 'apt'){
+    w = 26; h = 40; m = mask(w, h);
+    mRect(m, 1, 8, 24, 32); mRect(m, 0, 7, 26, 2);           // body + ledge
+    mRect(m, 15, 1, 7, 5); mRect(m, 16, 6, 1, 1); mRect(m, 20, 6, 1, 1); // water tank
+    win = { x0: 4, y0: 11, dx: 5, dy: 6, ww: 2, wh: 3, rows: 4 };
+  } else {
+    w = 20; h = 50; m = mask(w, h);
+    mRect(m, 1, 10, 18, 40); mRect(m, 4, 5, 12, 6);          // tower + setback
+    mRect(m, 9, 0, 2, 5);                                     // antenna
+    win = { x0: 4, y0: 13, dx: 4, dy: 5, ww: 2, wh: 3, rows: 6 };
+  }
+  const g = stylize(m);
+  // windows: dark panes, a few lit (white)
+  for (let r = 0; r < win.rows; r++){
+    const y = win.y0 + r * win.dy;
+    for (let x = win.x0; x + win.ww < w - 2; x += win.dx){
+      const lit = rnd() < 0.25;
+      for (let j = 0; j < win.wh; j++) for (let i = 0; i < win.ww; i++){
+        if (g[y + j] && g[y + j][x + i] !== '.' && g[y + j][x + i] !== '#') g[y + j][x + i] = lit ? 'l' : '#';
+      }
+    }
+  }
+  // door on the ground floor
+  const dw = kind === 'tower' ? 4 : 5, dx = Math.floor(w / 2 - dw / 2) + (kind === 'shop' ? 0 : 0);
+  for (let j = h - 7; j < h - 1; j++) for (let i = dx; i < dx + dw; i++) g[j][i] = (i === dx || i === dx + dw - 1 || j === h - 7) ? '#' : 's';
+  if (kind === 'shop'){ // awning stripe
+    for (let i = 2; i < w - 2; i++) g[19][i] = i % 2 ? '#' : 's';
+    for (let i = 2; i < w - 2; i++) g[20][i] = '#';
+  }
+  return toRows(g);
+}
+const BUILDINGS_S = [makeShop(3)];
+const BUILDINGS_L = [makeBuilding('apt', 5), makeBuilding('tower', 7), makeBuilding('apt', 13), makeBuilding('tower', 21)];
+
+// plane: side view in the same style as the buildings (outline, grey shade on the left/bottom, white fill, dark window panes), nose facing the dino
+const PLANE = [
+"................................................######....",
+"...............................................#ssooo#....",
+"...............................................#ssooo#....",
+"..............................................#ssoooo#....",
+"..............................................#ssoooo#....",
+".............................................#ssoooooo#...",
+".............................................#ssoooooo#...",
+"............................................#ssooooooo#...",
+".....##################################################...",
+"...##soooooooooooooooooooooooooooooooooooooooooooooooo#...",
+"..#s####oooo##oo##oo##oo##oo##oo##oo##oo##ooooooooooooo#..",
+".#ss#ooooooooooooooooooooooooooooooooooooooooooooooooos#..",
+".#ssoooooooooooooooooooooooooooooooooooooooooo##########..",
+".#sslllllllllllllllllll########llllllllllllllll#sssss####.",
+"..#ssooooooooooooooooooo#ssoooo#oooooooooooooooo#####.....",
+"...##ssssssssssssssssssss#ssoooo#ssssssssssssssss###......",
+".....######################ssoooo################.........",
+"........................########oo#.......................",
+".......................#ssooooo#ooo#......................",
+".......................#sssssss#sooo#.....................",
+"........................########ssooo#....................",
+"................................#ssoos#...................",
+".................................#sss###..................",
+"..................................###.....................",
+];
+const PTERO1 = PLANE, PTERO2 = PLANE;
+const ROCK = makeRock();
+
+function sprW(rows){ let m = 0; for (const r of rows) m = Math.max(m, r.length); return m; }
+function spr(rows, x, y, p, color, ch){
+  ch = ch || '#';
+  ctx.fillStyle = color; x = Math.round(x); y = Math.round(y);
+  for (let j = 0; j < rows.length; j++){
+    const r = rows[j]; let i = 0;
+    while (i < r.length){
+      if (r[i] === ch){ let k = i; while (k < r.length && r[k] === ch) k++; ctx.fillRect(x + i * p, y + j * p, (k - i) * p, p); i = k; }
+      else i++;
+    }
+  }
+}
+
+// ---------- audio ----------
+let AC = null, muted = false, hum = null;
+function audio(){
+  if (!AC){ try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } }
+  if (AC && AC.state === 'suspended') AC.resume().catch(() => {});
+  return AC;
+}
+function beep(f1, f2, dur, type, vol){
+  if (muted || !AC) return;
+  const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+  o.type = type || 'square';
+  o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), t + dur);
+  g.gain.setValueAtTime(vol || 0.05, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(AC.destination); o.start(t); o.stop(t + dur + 0.03);
+}
+function noise(dur, vol, f1, f2){
+  if (muted || !AC) return;
+  const t = AC.currentTime, n = Math.floor(AC.sampleRate * dur);
+  const buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+  const src = AC.createBufferSource(); src.buffer = buf;
+  const f = AC.createBiquadFilter(); f.type = 'lowpass';
+  f.frequency.setValueAtTime(f1, t); f.frequency.exponentialRampToValueAtTime(f2, t + dur);
+  const g = AC.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(f).connect(g).connect(AC.destination); src.start(t); src.stop(t + dur);
+}
+function humStart(){
+  if (muted || !AC || hum) return;
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = 'triangle'; o.frequency.value = 110; g.gain.value = 0.035;
+  o.connect(g).connect(AC.destination); o.start(); hum = { o, g };
+}
+function humSet(c){ if (hum) hum.o.frequency.setTargetAtTime(110 + 320 * c, AC.currentTime, 0.02); }
+function humStop(){
+  if (!hum) return;
+  try { hum.g.gain.setTargetAtTime(0.0001, AC.currentTime, 0.02); hum.o.stop(AC.currentTime + 0.1); } catch (e) {}
+  hum = null;
+}
+const sndBtn = document.getElementById('snd');
+sndBtn.addEventListener('click', () => {
+  muted = !muted;
+  document.getElementById('sndLabel').textContent = muted ? 'Muted' : 'Sound';
+  document.getElementById('sndWaves').style.display = muted ? 'none' : '';
+  document.getElementById('sndOff').style.display = muted ? '' : 'none';
+  sndBtn.setAttribute('aria-pressed', String(!muted));
+  if (muted) humStop();
+  sndBtn.blur(); cv.focus();
+});
+
+// ---------- game constants ----------
+const G = 2600, JV = 660;           // jump ~84px
+const CHARGE_TIME = 0.85;           // seconds to full
+const T1 = 0.18, T2 = 0.55;         // level thresholds
+const START_SPD = 360, MAX_SPD = 880, ACC = 7;
+const RANGE = [0, 140, 220, 330];
+const SLOW = 0.4;
+const TOUCH = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+const NIGHT_EVERY = 30, NIGHT_LEN = 20;   // seconds of play
+let playT = 0, night = false, nightK = 0, moonX = 400;
+const STARS = Array.from({ length: 14 }, (_, i) => ({ x: (i * 97 + 31) % W, y: 8 + (i * 53) % 70, s: i % 3 === 0 ? 2 : 1 }));
+const OCTO_HP = 4, OCTO_DMG = [0, 1, 2, 4], OCTO_KB = [0, 200, 240, 0];
+
+// ---------- state ----------
+let state = 'ready', overT = 0;
+let held = false, pendingPress = false, jumpBuf = 0;
+let charging = false, charge = 0, fullT = 0, cooldown = 0, roarAnim = 0;
+let speed, sm, dist, bonus, hi = 0;
+let dino, obstacles, waves, debris, floaters, clouds;
+let spawnIn, nextType, groundOff, runT, shake, hint, hintT, seenRock, seenMid, lastMilestone, flashT;
+try { hi = parseInt(localStorage.getItem('dinoRoarHi') || '0', 10) || 0; } catch (e) {}
+
+function reset(){
+  speed = START_SPD; sm = 1; dist = 0; bonus = 0;
+  dino = { x: 44, jy: 0, vy: 0 };
+  obstacles = []; waves = []; debris = []; floaters = [];
+  clouds = [{ x: 110, y: 30, k: 0 }, { x: 330, y: 50, k: 2 }, { x: 520, y: 18, k: 1 }];
+  spawnIn = 420; nextType = 'cactus'; groundOff = 0; runT = 0; shake = 0;
+  hint = ''; hintT = 0; lastMilestone = 0; flashT = 0;
+  playT = 0; setNight(false); nightK = 0;
+  charging = false; charge = 0; fullT = 0; cooldown = 0; roarAnim = 0; pendingPress = false; jumpBuf = 0;
+  humStop();
+}
+if (typeof seenRock === 'undefined'){ seenRock = false; seenMid = false; }
+reset();
+
+// ground features
+const GL = 1200, bumps = [], specks = [];
+(() => {
+  let s = 5; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  for (let x = 0; x < GL; x += 60 + Math.floor(r() * 140)) bumps.push(x);
+  for (let i = 0; i < 70; i++) specks.push([Math.floor(r() * GL), GROUND + 1 + Math.floor(r() * 9), 1 + Math.floor(r() * 3)]);
+})();
+
+function score(){ return Math.floor(dist) + bonus; }
+function pad(n){ return String(Math.min(99999, n)).padStart(5, '0'); }
+function level(c){ return c >= 1 ? 3 : c >= T2 ? 2 : c >= T1 ? 1 : 0; }
+
+// ---------- input ----------
+function press(){
+  if (held) return;
+  held = true; audio();
+  if (state === 'ready'){ state = 'running'; reset(); return; }
+  if (state === 'over'){ if (overT > 0.45){ state = 'running'; reset(); } return; }
+  pendingPress = true;
+}
+function release(){
+  if (!held) return;
+  held = false;
+  if (state !== 'running') return;
+  if (charging) doRelease();
+  else if (pendingPress){ pendingPress = false; jumpBuf = 0.15; }
+}
+function doRelease(){
+  charging = false; humStop();
+  const lv = level(charge);
+  if (lv === 0) jump(); else roar(lv);
+  charge = 0; fullT = 0;
+}
+function jump(){
+  if (dino.jy > 0) return;
+  dino.vy = JV; dino.jy = 0.01;
+  beep(520, 880, 0.09, 'square', 0.04);
+}
+function roar(lv){
+  const mx = dino.x + 48 * DS, my = dinoY() + 18 * DS;
+  waves.push({ x: mx, y: my, r: 4, maxR: RANGE[lv], lv, kills: 0 });
+  cooldown = 0.28; roarAnim = 0.45;
+  shake = lv === 3 ? 6 : lv === 2 ? 3 : 1;
+  noise(0.22 + 0.14 * lv, 0.12 + 0.04 * lv, 2200, 180);
+  beep(200 + 40 * lv, 55, 0.25 + 0.1 * lv, 'sawtooth', 0.045);
+}
+
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.key === ' '){ e.preventDefault(); if (!e.repeat) press(); }
+});
+window.addEventListener('keyup', e => {
+  if (e.code === 'Space' || e.key === ' '){ e.preventDefault(); release(); }
+});
+cv.addEventListener('pointerdown', e => { e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (_) {} cv.focus(); press(); });
+cv.addEventListener('pointerup', e => { e.preventDefault(); release(); });
+cv.addEventListener('pointercancel', () => release());
+// Phones: everything below the game (to the bottom of the page) also works as the Space bar.
+const NARROW = matchMedia('(max-width: 640px)');
+let zoneId = null;
+document.addEventListener('pointerdown', e => {
+  if (!(TOUCH || NARROW.matches) || e.target.closest('a, button, #game')) return;
+  if (e.clientY < cv.getBoundingClientRect().bottom) return;
+  e.preventDefault(); zoneId = e.pointerId; cv.focus({ preventScroll: true }); press();
+});
+const zoneUp = e => { if (e.pointerId !== zoneId) return; zoneId = null; release(); };
+window.addEventListener('pointerup', zoneUp);
+window.addEventListener('pointercancel', zoneUp);
+cv.addEventListener('contextmenu', e => e.preventDefault());
+window.addEventListener('blur', () => release());
+document.addEventListener('visibilitychange', () => { if (document.hidden) release(); });
+
+// ---------- spawning ----------
+function pickNext(){
+  const d = dist, r = Math.random();
+  if (d > 260 && r < 0.13) return 'rock';
+  if (d > 380 && r < 0.36) return 'ptero';
+  return 'cactus';
+}
+function spawn(type){
+  const x0 = W + 10;
+  if (type === 'cactus'){
+    let n = 1; const r = Math.random();
+    if (r > 0.55) n = 2; if (r > 0.86) n = 3;
+    const big = Math.random() < (dist > 120 ? 0.45 : 0.15);
+    let x = x0;
+    for (let i = 0; i < n; i++){
+      const pool = big ? BUILDINGS_L : BUILDINGS_S;
+      const rows = pool[Math.floor(Math.random() * pool.length)], w = sprW(rows), h = rows.length;
+      obstacles.push({ type: 'cactus', rows, x, y: GROUND - h + 1, w, h, p: 1, need: 1, pts: 25, vx: 0, pad: 3 });
+      x += w + 1;
+    }
+  } else if (type === 'ptero'){
+    const r = Math.random();
+    let hgt = r < 0.34 ? 'low' : r < 0.68 ? 'mid' : 'high';
+    const w = 58, h = 24;
+    const y = hgt === 'low' ? GROUND - 30 : hgt === 'mid' ? GROUND - 52 : GROUND - 70;
+    obstacles.push({ type: 'ptero', rows: PTERO1, x: x0, y, w, h, p: 1, need: 2, pts: 50, vx: 40, pad: 4, hgt });
+    if (hgt === 'mid' && !seenMid){ seenMid = true; showHint('PLANE! CHARGE TO LV2'); }
+  } else {
+    const w = sprW(OCTO[0]), h = OCTO[0].length;
+    obstacles.push({ type: 'rock', rows: OCTO[0], frames: OCTO, x: x0, y: GROUND - h + 1, w, h, p: 1, need: 3, pts: 100, vx: 0, pad: 4, hp: OCTO_HP, maxHp: OCTO_HP, kb: 0, flash: 0 });
+    if (!seenRock){ seenRock = true; showHint('SAILBACK! KEEP ROARING!'); }
+  }
+}
+function showHint(s){ hint = s; hintT = 2.4; }
+
+function destroy(o, w){
+  o.dead = true;
+  w.kills++;
+  const pts = o.pts * w.kills;
+  bonus += pts;
+  floaters.push({ x: o.x + o.w / 2, y: o.y - 6, s: '+' + pts + (w.kills > 1 ? ' X' + w.kills : ''), t: 0.9 });
+  const rows = o.rows;
+  for (let j = 0; j < rows.length; j += 2) for (let i = 0; i < rows[j].length; i += 2){
+    if (rows[j][i] !== '.' && Math.random() < 0.5){
+      debris.push({ x: o.x + i * o.p, y: o.y + j * o.p, vx: 120 + Math.random() * 320, vy: -60 - Math.random() * 320, s: Math.random() < 0.3 ? 3 : 2, t: 1.4 });
+    }
+  }
+  noise(0.12, 0.08, 3000, 400);
+  beep(300 + 120 * w.kills, 900 + 200 * w.kills, 0.08, 'square', 0.03);
+}
+
+function hit(a, b){ return a[0] < b[0] + b[2] && a[0] + a[2] > b[0] && a[1] < b[1] + b[3] && a[1] + a[3] > b[1]; }
+function dinoY(){ return GROUND - Math.round(DINO_H * DS) - Math.round(dino.jy) + (charging ? 1 : 0); }
+function dinoBoxes(){
+  const x = dino.x, y = dinoY();
+  return [[26, 5, 15, 11], [17, 18, 13, 10], [6, 26, 20, 9], [13, 37, 13, 9]].map(b => [x + b[0] * DS, y + b[1] * DS, b[2] * DS, b[3] * DS]);
+}
+function obsBox(o){
+  if (o.type === 'ptero') return [o.x + 2, o.y + 9, o.w - 6, 7];   // fuselage band
+  return [o.x + o.pad, o.y + o.pad, o.w - o.pad * 2, o.h - o.pad];
+}
+
+function gameOver(){
+  state = 'over'; overT = 0; humStop(); charging = false;
+  const s = score();
+  if (s > hi){ hi = s; try { localStorage.setItem('dinoRoarHi', String(hi)); } catch (e) {} }
+  beep(220, 60, 0.35, 'square', 0.06);
+  shake = 4;
+}
+
+// ---------- update ----------
+function update(dt){
+  shake = Math.max(0, shake - dt * 18);
+  if (state === 'over'){ overT += dt; updateFx(dt, 0); return; }
+  if (state !== 'running'){ updateClouds(dt, 60); return; }
+
+  playT += dt;
+  const wantNight = playT >= NIGHT_EVERY && (playT % NIGHT_EVERY) < NIGHT_LEN;
+  if (wantNight !== night){ setNight(wantNight); if (wantNight) showHint('NIGHT FALLS'); }
+  nightK += ((night ? 1 : 0) - nightK) * Math.min(1, dt * 1.2);
+  cooldown = Math.max(0, cooldown - dt);
+  roarAnim = Math.max(0, roarAnim - dt);
+  const grounded = dino.jy <= 0;
+  if (grounded && pendingPress && held && cooldown <= 0 && !charging){
+    charging = true; charge = 0; fullT = 0; pendingPress = false; humStart();
+  }
+  if (grounded && jumpBuf > 0 && !charging){ jump(); jumpBuf = 0; }
+  jumpBuf = Math.max(0, jumpBuf - dt);
+
+  if (charging){
+    const before = level(charge);
+    charge = Math.min(1, charge + dt / CHARGE_TIME);
+    const after = level(charge);
+    if (after > before) beep(400 + after * 200, 600 + after * 250, 0.06, 'square', 0.03);
+    humSet(charge);
+    if (charge >= 1){ fullT += dt; if (fullT > 0.9) doRelease(); }
+  }
+
+  sm += ((charging ? SLOW : 1) - sm) * Math.min(1, dt * 12);
+  speed = Math.min(MAX_SPD, speed + ACC * dt);
+  const v = speed * sm;
+  dist += v * dt * 0.025;
+
+  const m = Math.floor(score() / 100);
+  if (m > lastMilestone){ lastMilestone = m; flashT = 0.8; beep(980, 1320, 0.07, 'square', 0.03); }
+  flashT = Math.max(0, flashT - dt);
+  hintT = Math.max(0, hintT - dt);
+
+  // dino physics
+  if (dino.jy > 0 || dino.vy > 0){
+    dino.vy -= G * dt; dino.jy += dino.vy * dt;
+    if (dino.jy <= 0){ dino.jy = 0; dino.vy = 0; }
+  }
+  runT += v * dt;
+
+  // spawn
+  // no new obstacles while a boss is on screen, so nothing overlaps its long tail
+  if (!obstacles.some(b => b.hp !== undefined)) spawnIn -= v * dt;
+  if (spawnIn <= 0){
+    spawn(nextType);
+    nextType = pickNext();
+    spawnIn = speed * (0.6 + Math.random() * 0.65) + 130;
+    if (nextType === 'rock') spawnIn += speed * 0.75;
+  }
+
+  // obstacles
+  for (const o of obstacles){
+    o.x -= (v + o.vx * sm) * dt;
+    if (o.kb > 0){ const mv = Math.min(o.kb, 520 * dt); o.x += mv; o.kb -= mv; }
+    if (o.flash > 0) o.flash -= dt;
+  }
+  obstacles = obstacles.filter(o => !o.dead && o.x + o.w > -20);
+
+  // waves
+  for (const w of waves){
+    w.r += 760 * dt;
+    for (const o of obstacles){
+      if (o.dead) continue;
+      if (o.x <= w.x + w.r && o.x + o.w >= w.x && o.x - w.x <= w.maxR){
+        if (o.hp !== undefined){
+          if (o.hitBy === w) continue;
+          o.hitBy = w;
+          const dmg = OCTO_DMG[w.lv];
+          o.hp -= dmg;
+          if (o.hp <= 0) destroy(o, w);
+          else {
+            o.kb += OCTO_KB[w.lv]; o.flash = 0.18;
+            bonus += 10 * dmg;
+            floaters.push({ x: o.x + 32, y: o.y + 16, s: '-' + dmg, t: 0.7 });
+            noise(0.1, 0.07, 1200, 300); beep(160, 90, 0.12, 'square', 0.04);
+          }
+        }
+        else if (w.lv >= o.need) destroy(o, w);
+        else if (!o.tink){ o.tink = true; floaters.push({ x: o.x + o.w / 2, y: o.y - 6, s: 'LV' + o.need + '!', t: 0.8 }); beep(1500, 1200, 0.05, 'square', 0.03); }
+      }
+    }
+  }
+  waves = waves.filter(w => w.r < w.maxR + 30);
+  obstacles = obstacles.filter(o => !o.dead);
+
+  // collision
+  const boxes = dinoBoxes();
+  for (const o of obstacles){
+    const b = obsBox(o);
+    for (const a of boxes) if (hit(a, b)){ gameOver(); return; }
+  }
+
+  groundOff = (groundOff + v * dt) % GL;
+  if (nightK > 0.02){ moonX -= v * 0.012 * dt; if (moonX < -30) moonX = W + 20; }
+  updateClouds(dt, v * 0.15);
+  updateFx(dt, v);
+}
+function updateClouds(dt, v){
+  for (const c of clouds){
+    c.x -= v * dt;
+    if (c.x < -80){ c.x = W + 20 + Math.random() * 200; c.y = 14 + Math.random() * 50; c.k = Math.floor(Math.random() * CLOUD_SHAPES.length); }
+  }
+}
+function updateFx(dt, v){
+  for (const p of debris){ p.vy += 1100 * dt; p.x += (p.vx - v * 0.6) * dt; p.y += p.vy * dt; p.t -= dt; }
+  debris = debris.filter(p => p.t > 0 && p.y < H + 10);
+  for (const f of floaters){ f.y -= 28 * dt; f.t -= dt; }
+  floaters = floaters.filter(f => f.t > 0);
+}
+
+// ---------- render ----------
+function drawGround(){
+  ctx.fillStyle = INK;
+  ctx.fillRect(0, GROUND - 3, W, 1);
+  for (const bx0 of bumps){
+    let x = Math.round(bx0 - groundOff); if (x < -20) x += GL;
+    if (x > W + 20) continue;
+    ctx.fillStyle = BG; ctx.fillRect(x + 2, GROUND - 3, 8, 1);
+    ctx.fillStyle = INK;
+    ctx.fillRect(x, GROUND - 4, 2, 1); ctx.fillRect(x + 2, GROUND - 5, 8, 1); ctx.fillRect(x + 10, GROUND - 4, 2, 1);
+  }
+  ctx.fillStyle = MID;
+  for (const [sx, sy, sw] of specks){
+    let x = Math.round(sx - groundOff); if (x < -5) x += GL;
+    if (x <= W) ctx.fillRect(x, sy, sw, 1);
+  }
+}
+function drawWave(w){
+  const alpha = Math.max(0, 1 - w.r / (w.maxR + 30));
+  ctx.globalAlpha = 0.35 + 0.65 * alpha;
+  ctx.fillStyle = INK;
+  const rings = w.lv + 1;
+  for (let k = 0; k < rings; k++){
+    const r = w.r - k * 10;
+    if (r <= 4) continue;
+    const span = 0.75;
+    const steps = Math.max(6, Math.floor(r * span * 2 / 3));
+    for (let i = 0; i <= steps; i++){
+      if ((i + k) % 2 === 1 && k > 0) continue;
+      const a = -span + (2 * span * i) / steps;
+      const px = Math.round((w.x + Math.cos(a) * r) / 2) * 2;
+      const py = Math.round((w.y + Math.sin(a) * Math.min(r, 70) * 0.8) / 2) * 2;
+      if (py > GROUND - 5) continue;
+      ctx.fillRect(px, py, 2, 2);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+function drawHp(o){
+  const bw = 44, bh = 6, x = Math.round(o.x + 10), y = Math.round(o.y + 26);   // just above the boss's head
+  ctx.fillStyle = BG; ctx.fillRect(x - 1, y - 1, bw + 2, bh + 2);
+  ctx.fillStyle = INK;
+  ctx.fillRect(x, y, bw, 1); ctx.fillRect(x, y + bh - 1, bw, 1); ctx.fillRect(x, y, 1, bh); ctx.fillRect(x + bw - 1, y, 1, bh);
+  const seg = (bw - 4) / o.maxHp;
+  for (let i = 0; i < o.maxHp; i++){
+    const sx = x + 2 + Math.round(i * seg), sw = Math.round((i + 1) * seg) - Math.round(i * seg) - 1;
+    ctx.fillStyle = i < o.hp ? INK : LIGHT;
+    ctx.fillRect(sx, y + 2, sw, bh - 4);
+  }
+}
+function setNight(on){ night = on; cv.style.filter = on ? 'invert(1)' : 'none'; document.documentElement.classList.toggle('night', on); }
+function drawSky(){
+  // drawn dark: the canvas is colour-inverted at night, so these show up light
+  ctx.globalAlpha = nightK;
+  ctx.fillStyle = '#6a6a6a';
+  for (const st of STARS){
+    let x = Math.round((st.x - groundOff * 0.03 % W + W) % W);
+    ctx.fillRect(x, st.y, st.s, st.s);
+    if (st.s === 2){ ctx.fillRect(x - 1, st.y + 0.5 | 0, 1, 1); ctx.fillRect(x + 2, st.y + 1, 1, 1); }
+  }
+  const mx = Math.round(moonX), my = 34;
+  ctx.fillStyle = INK;
+  for (let j = 0; j < 18; j++) for (let i = 0; i < 18; i++){
+    const a = (i - 8.5) ** 2 + (j - 8.5) ** 2 <= 8.5 * 8.5;
+    const b = (i - 13) ** 2 + (j - 6) ** 2 <= 7.5 * 7.5;
+    if (a && !b) ctx.fillRect(mx + i, my + j, 1, 1);
+  }
+  ctx.globalAlpha = 1;
+}
+function drawMeter(x, y){
+  const w = 38, h = 6;
+  ctx.fillStyle = INK;
+  ctx.fillRect(x, y, w, 1); ctx.fillRect(x, y + h - 1, w, 1); ctx.fillRect(x, y, 1, h); ctx.fillRect(x + w - 1, y, 1, h);
+  const full = charge >= 1;
+  const blink = full && Math.floor(performance.now() / 90) % 2 === 0;
+  ctx.fillStyle = blink ? MID : INK;
+  ctx.fillRect(x + 2, y + 2, Math.round((w - 4) * charge), h - 4);
+  ctx.fillStyle = BG;
+  for (const t of [T1, T2]) ctx.fillRect(x + 2 + Math.round((w - 4) * t), y + 1, 1, h - 2);
+  const lv = level(charge);
+  const label = lv === 3 ? 'MAX' : lv === 0 ? '' : 'LV' + lv;
+  if (label) text(label, x + w + 4, y, 1, INK, 'left');
+}
+function drawDino(){
+  let rows;
+  if (state === 'over') rows = DINO_DEAD;
+  else if (state === 'ready') rows = DINO_STAND;
+  else if (roarAnim > 0) rows = DINO_ROAR;
+  else if (dino.jy > 0 || charging) rows = DINO_STAND;
+  else rows = Math.floor(runT / 34) % 2 ? DINO_RUN1 : DINO_RUN2;
+  let x = dino.x, y = dinoY();
+  if (charging){
+    const lv = level(charge);
+    if (lv >= 2 && Math.random() < 0.5) x += Math.random() < 0.5 ? -1 : 1;
+    if (lv >= 3 && Math.random() < 0.5) y += Math.random() < 0.5 ? -1 : 1;
+  }
+  sprMulti(rows, x, y, DS, REX_COLORS);
+  if (charging) drawMeter(dino.x + 3, y - 10);
+}
+function render(){
+  ctx.setTransform(SC, 0, 0, SC, 0, 0);
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  const sx = shake > 0 ? Math.round((Math.random() * 2 - 1) * shake) : 0;
+  const sy = shake > 0 ? Math.round((Math.random() * 2 - 1) * shake * 0.6) : 0;
+  ctx.translate(sx, sy);
+
+  if (nightK > 0.02) drawSky();
+  for (const c of clouds) sprMulti(CLOUD_SHAPES[c.k || 0], c.x, c.y, 2, CLOUD_COLORS);
+  drawGround();
+  for (const o of obstacles){
+    const rows = o.type === 'ptero' ? (Math.floor(performance.now() / 160) % 2 ? PTERO1 : PTERO2)
+               : o.frames ? o.frames[Math.floor(performance.now() / 280) % 2] : o.rows;
+    if (!(o.flash > 0 && Math.floor(o.flash * 30) % 2 === 0)) sprMulti(rows, o.x, o.y, 1, REX_COLORS);
+    if (o.hp !== undefined) drawHp(o);
+  }
+  ctx.fillStyle = INK;
+  for (const p of debris) ctx.fillRect(Math.round(p.x), Math.round(p.y), p.s, p.s);
+  for (const w of waves) drawWave(w);
+  drawDino();
+  for (const f of floaters){ ctx.globalAlpha = Math.min(1, f.t * 2); text(f.s, f.x, f.y, 1, INK, 'center'); }
+  ctx.globalAlpha = 1;
+
+  ctx.setTransform(SC, 0, 0, SC, 0, 0);
+  // score
+  const showScore = !(flashT > 0 && Math.floor(flashT * 8) % 2 === 0);
+  text('HI ' + pad(hi), W - 10 - textW('00000', 2) - 18, 10, 2, MID, 'right');
+  if (showScore) text(pad(score()), W - 10, 10, 2, INK, 'right');
+
+  if (state === 'ready'){
+    text('KAIJU ROAR', W / 2, 46, 3, INK, 'center');
+    text(TOUCH ? 'TAP TO START' : 'PRESS SPACE TO START', W / 2, 80, 1, INK, 'center');
+    if (DS === 1) text(TOUCH ? 'TAP = JUMP   HOLD + LET GO = ROAR' : 'TAP = JUMP   HOLD + RELEASE = ROAR', W / 2, 92, 1, MID, 'center');
+  } else if (state === 'over'){
+    text('GAME OVER', W / 2, 50, 3, INK, 'center');
+    if (overT > 0.45) text(TOUCH ? 'TAP TO PLAY AGAIN' : 'PRESS SPACE TO PLAY AGAIN', W / 2, 80, 1, MID, 'center');
+  } else if (hintT > 0 && Math.floor(hintT * 5) % 2 === 0){
+    text(hint, W / 2, 22, 2, INK, "center");
+  }
+}
+
+// ---------- loop ----------
+let last = performance.now();
+function frame(t){
+  const dt = Math.min(0.033, (t - last) / 1000); last = t;
+  update(dt); render();
+  requestAnimationFrame(frame);
+}
+
+// ---------- page pixel art (logo wave + control illustrations) ----------
+const WAVE_ICON = ["....................##................", "....................##................", "......................##..............", "......................##..............", "........................##............", "........................##............", "..........................##..........", "..........................##..........", "................##..........##........", "................##..........##........", "..............................##......", "..............................##......", "......##..........##..........##......", "......##..........##..........##......", "................................##....", "................................##....", "..........##..........##........##....", "..........##..........##........##....", "##................................##..", "##................................##..", "............##..........##............", "............##..........##............", "....##............................##..", "....##............................##..", "..............##..........##........##", "..............##..........##........##", "....................................##", "....................................##", "......##........##..................##", "......##........##..................##", "..........................##........##", "..........................##........##", "......##..............................", "......##..............................", "................##........##........##", "................##........##........##", "......##............................##", "......##............................##", "................##..................##", "................##..................##", "..........................##........##", "..........................##........##", "....##........##..................##..", "....##........##..................##..", "........................##............", "........................##............", "##..........##....................##..", "##..........##....................##..", "......................##........##....", "......................##........##....", "........##......................##....", "........##......................##....", "..................##..........##......", "..................##..........##......", "..............................##......", "..............................##......", "................##..........##........", "................##..........##........", "..........................##..........", "..........................##..........", "........................##............", "........................##............", "......................##..............", "......................##..............", "....................##................", "....................##................"];
+if (TOUCH) for (const p of document.querySelectorAll('[data-touch]')) p.textContent = p.dataset.touch;
+(function drawPageArt(){
+  const pal = { '#': INK, 's': '#a6a6a6', 'l': '#e4e4e4', 'o': '#ffffff', 'h': '#ffffff' };
+  for (const c of document.querySelectorAll('canvas.px[data-art]')){
+    const kind = c.dataset.art;
+    const rows = kind === 'dino' ? REX_ROAR : kind === 'dino-run' ? DINO_RUN1 : WAVE_ICON;
+    const w = Math.max(...rows.map(r => r.length)), h = rows.length;
+    c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    for (let j = 0; j < h; j++) for (let i = 0; i < rows[j].length; i++){
+      const col = pal[rows[j][i]]; if (!col) continue; g.fillStyle = col; g.fillRect(i, j, 1, 1);
+    }
+    const cssH = parseFloat(c.style.height) || (kind === 'logo-wave' ? 34 : h);
+    c.style.height = cssH + 'px'; c.style.width = (cssH * w / h) + 'px';
+  }
+})();
+resize();
+cv.focus();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
