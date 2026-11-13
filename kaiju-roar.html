@@ -147,6 +147,7 @@ function resize(){
   if (r.width) W = r.width < 600 ? Math.max(300, Math.round(r.width)) : 600;
   cv.style.aspectRatio = W + ' / ' + H;
   DS = W < 600 ? 1.5 : 1;
+  if (typeof dino !== 'undefined' && dino) dino.x = dinoX();
   SC = Math.max(1, Math.ceil((r.width || W) * dpr / W));
   if (DS !== 1 && SC % 2) SC++;   // keep 1.5x dino pixels on whole device pixels
   cv.width = W * SC; cv.height = H * SC;
@@ -849,7 +850,7 @@ try { hi = parseInt(localStorage.getItem('dinoRoarHi') || '0', 10) || 0; } catch
 
 function reset(){
   speed = START_SPD; sm = 1; dist = 0; bonus = 0;
-  dino = { x: 44, jy: 0, vy: 0 };
+  dino = { x: dinoX(), jy: 0, vy: 0 };
   obstacles = []; waves = []; debris = []; floaters = [];
   clouds = [{ x: 110, y: 30, k: 0 }, { x: 330, y: 50, k: 2 }, { x: 520, y: 18, k: 1 }];
   spawnIn = 420; nextType = 'cactus'; groundOff = 0; runT = 0; shake = 0;
@@ -984,6 +985,7 @@ function destroy(o, w){
 }
 
 function hit(a, b){ return a[0] < b[0] + b[2] && a[0] + a[2] > b[0] && a[1] < b[1] + b[3] && a[1] + a[3] > b[1]; }
+function dinoX(){ return DS > 1 ? 0 : 44; }   // phones: dino sits flush against the left edge
 function dinoY(){ return GROUND - Math.round(DINO_H * DS) - Math.round(dino.jy) + (charging ? 1 : 0); }
 function dinoBoxes(){
   const x = dino.x, y = dinoY();
