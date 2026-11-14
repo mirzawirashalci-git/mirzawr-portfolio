@@ -55,6 +55,8 @@
   .fish{position:fixed;left:0;top:0;z-index:45;pointer-events:none;will-change:transform;opacity:0;transition:opacity .6s ease}
   .fish.on{opacity:1}
   .fish-inner{width:40px;height:24px;transform-origin:50% 50%}
+  .fish.baby .fish-inner{width:24px;height:14px}
+  .fish.baby .fish-svg{filter:drop-shadow(0 3px 4px rgba(246,109,30,.16))}
   .fish-svg{display:block;filter:drop-shadow(0 4px 6px rgba(246,109,30,.18))}
   .fish-tail{transform-box:fill-box;transform-origin:0% 50%;animation:tail var(--tail,.5s) steps(2,jump-none) infinite alternate}
   .fish-fin{transform-box:fill-box;transform-origin:0% 20%;animation:fin calc(var(--tail,.5s) * 1.15) steps(2,jump-none) infinite alternate}
@@ -1211,15 +1213,21 @@ void main(){
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const el = document.getElementById('fish'), inner = el.firstElementChild;
   const W = 40, H = 24;
+  /* baby fish: same pixel sprite at ~60% size, trails behind the parent's tail */
+  const baby = el.cloneNode(true); baby.id = 'fish-baby'; baby.classList.add('baby');
+  const bsvg = baby.querySelector('svg'); bsvg.setAttribute('width', 24); bsvg.setAttribute('height', 14.4);
+  el.after(baby);
+  const binner = baby.firstElementChild, BW = 24, BH = 14;
   let x = innerWidth * .5 - 200, y = 140, vx = 0, vy = 0;      /* start near the intro */
+  let bx = x + W + 8, by = y + 6, bvx = 0, bvy = 0, bface = 1, btilt = 0, lastBabyBubble = 0;
   let tx = x, ty = y, mx = null, my = null, lastMove = 0, face = 1, tilt = 0, t = 0, lastBubble = 0, side = -1, chasing = false;
   const setTarget = (cx, cy) => { mx = cx; my = cy; lastMove = performance.now(); el.classList.add('on'); };
   addEventListener('pointermove', e => setTarget(e.clientX, e.clientY), {passive:true});
   addEventListener('pointerdown', e => { setTarget(e.clientX, e.clientY); burst(); }, {passive:true});
   document.addEventListener('mouseleave', () => { lastMove = 0; });
-  const bubble = (bx, by) => {
+  const bubble = (bx, by, small) => {
     const b = document.createElement('span'); b.className = 'bubble';
-    const sz = 4 + Math.random() * 5; b.style.width = b.style.height = sz + 'px';
+    const sz = small ? 2 + Math.random() * 2.5 : 4 + Math.random() * 5; b.style.width = b.style.height = sz + 'px';
     b.style.setProperty('--x', bx + 'px'); b.style.setProperty('--y', by + 'px'); b.style.setProperty('--dx', (Math.random() * 16 - 8) + 'px');
     document.body.appendChild(b); setTimeout(() => b.remove(), 1700);
   };
@@ -1260,6 +1268,25 @@ void main(){
     inner.style.transform = `rotate(${tilt.toFixed(1)}deg) scaleX(${face})`;
     el.style.setProperty('--tail', speed > 4 ? '.14s' : speed > 1.5 ? '.26s' : '.55s');
     if (now - lastBubble > (speed > 4 ? 380 : 2800) && el.classList.contains('on')) { lastBubble = now; bubble(...mouth()); }
+
+    /* baby: aims just behind the parent's tail, with a slower, lazier spring so it lags and catches up */
+    const btx = face > 0 ? x + W + 6 : x - BW - 6;
+    const bty = y + H / 2 - BH / 2 + 3 + Math.sin(t * .05 + 1) * 4;
+    bvx = (bvx + (btx - bx) * .0045 * dt) * Math.pow(.9, dt);
+    bvy = (bvy + (bty - by) * .0045 * dt) * Math.pow(.9, dt);
+    bx += bvx * dt; by += bvy * dt;
+    const bspeed = Math.hypot(bvx, bvy);
+    if (Math.abs(bvx) > .6) bface = bvx > 0 ? -1 : 1; else if (bspeed < .3) bface = face;
+    const bTargetTilt = Math.max(-20, Math.min(20, bvy * 5)) * (bface > 0 ? -1 : 1);
+    btilt += (bTargetTilt - btilt) * .12 * dt;
+    const bbob = Math.sin(t * .11 + 2) * 1.2;
+    baby.style.transform = `translate3d(${bx.toFixed(1)}px,${(by + bbob).toFixed(1)}px,0)`;
+    binner.style.transform = `rotate(${btilt.toFixed(1)}deg) scaleX(${bface})`;
+    baby.style.setProperty('--tail', bspeed > 3 ? '.11s' : bspeed > 1 ? '.2s' : '.42s');
+    baby.classList.toggle('on', el.classList.contains('on'));
+    if (now - lastBabyBubble > (bspeed > 3 ? 900 : 5200) && el.classList.contains('on')) {
+      lastBabyBubble = now; bubble(bx + (bface > 0 ? 1 : BW - 3), by + BH * .5 - 3, true);
+    }
     requestAnimationFrame(loop);
   };
   /* show the fish right away near the intro so visitors notice it */

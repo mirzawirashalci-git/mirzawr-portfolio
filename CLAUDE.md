@@ -24,6 +24,6 @@ Owner: Mirza (product designer, not a developer). Talk to him in Indonesian, pla
 5. If something goes wrong live: Vercel → Instant Rollback, or revert the merge commit.
 
 ## Design rules kept so far
-- Home: soft blue gradient, top underwater light shafts + bottom caustics (WebGL), pixel clownfish follows cursor.
+- Home: soft blue gradient, top underwater light shafts + bottom caustics (WebGL), pixel clownfish follows cursor; a baby clownfish (~60% size) trails behind its tail, slower, with small rare bubbles.
 - Study case pages: white background, no effects, no fish, no bubbles; Back pill in bottom nav.
 - Browser title always "Mirza's Portfolio"; no social preview image.
