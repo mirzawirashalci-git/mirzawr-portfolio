@@ -274,6 +274,10 @@
   .pc-media::after{content:"";position:absolute;inset:0;border-radius:inherit;opacity:.1;background:radial-gradient(closest-side,rgba(0,0,0,.1) 12%,rgba(0,0,0,.15) 20%,rgba(0,0,0,.25) 120%);pointer-events:none}
   .pc-media video{display:block;width:100%;height:100%;object-fit:cover}
   .pc-media.fit{background:#fff}
+  .pc-shine{position:absolute;inset:4.5px;border-radius:5.76px;pointer-events:none;mix-blend-mode:multiply;opacity:0;transition:opacity .3s;
+    background:linear-gradient(115deg,transparent 20%,rgba(165,255,122,.45) 35%,rgba(255,161,160,.45) 45%,rgba(188,233,236,.5) 55%,rgba(245,242,174,.5) 65%,transparent 80%);background-size:250% 250%}
+  .pcard:hover .pc-shine{opacity:1}
+  .pc-media{z-index:1}
   .pc-media.fit video{object-fit:contain}
   .pc-desc{position:absolute;left:12.5px;top:198.52px;width:167px;margin:0;font-size:9.8px;line-height:12.74px;text-wrap:pretty}
   .pc-foot{position:absolute;left:9.5px;top:253.52px;width:173px;padding:0 2.69px;opacity:.7;font-family:'Geist Mono',monospace;font-weight:500;font-size:5.96px;letter-spacing:.12px;white-space:nowrap}
@@ -497,6 +501,7 @@
     <div class="pgrid">
       <a class="pcard reveal" href="https://mooment.studio" target="_blank" rel="noopener">
         <div class="pc">
+          <div class="pc-shine"></div>
           <div class="pc-head"><span class="pc-logo"><img src="assets/proj-mooment.webp" alt="" width="15" height="15"></span><b>Mooment</b><svg class="arrow" viewBox="0 0 16 16" fill="none"><g opacity="0.6"><path d="M4.60577 11.4267L11.394 4.63846M11.3642 10.3251L11.394 4.63846L5.70736 4.66824" stroke="#32302E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
           <div class="pc-media fit"><video src="assets/proj-mooment.mp4" poster="assets/proj-mooment-poster.webp" muted loop playsinline preload="none" aria-label="Preview of Mooment: browsing card templates and opening the editor"></video></div>
           <p class="pc-desc">Create an exclusive template card for your memories</p>
@@ -505,6 +510,7 @@
       </a>
       <a class="pcard reveal" href="/kaiju-roar">
         <div class="pc">
+          <div class="pc-shine"></div>
           <div class="pc-head"><span class="pc-logo"><img src="assets/proj-kaiju.webp" alt="" width="15" height="15"></span><b>Kaiju Roar</b><svg class="arrow" viewBox="0 0 16 16" fill="none"><g opacity="0.6"><path d="M4.60577 11.4267L11.394 4.63846M11.3642 10.3251L11.394 4.63846L5.70736 4.66824" stroke="#32302E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
           <div class="pc-media"><video src="assets/proj-kaiju-v2.mp4" poster="assets/proj-kaiju-v2-poster.webp" muted loop playsinline preload="none" aria-label="Gameplay of Kaiju Roar: the kaiju jumps and roars through a city"></video></div>
           <p class="pc-desc">Pixel hypercasual game</p>
@@ -736,9 +742,9 @@
     const vio = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting){ v.preload = 'auto'; const p = v.play(); if (p) p.catch(()=>{}); } else v.pause(); }), {threshold:.25});
     pvids.forEach(v => vio.observe(v));
     $$('.pcard').forEach(a => {
-      const c = $('.pc', a);
+      const c = $('.pc', a), sh = $('.pc-shine', a);
       a.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; const r = a.getBoundingClientRect(); const x = (e.clientX - r.left)/r.width - .5, y = (e.clientY - r.top)/r.height - .5;
-        c.style.transition = 'transform .1s'; c.style.transform = `rotateY(${x*16}deg) rotateX(${-y*16}deg) translateY(-4px)`; });
+        c.style.transition = 'transform .1s'; c.style.transform = `rotateY(${x*16}deg) rotateX(${-y*16}deg) translateY(-4px)`; sh.style.backgroundPosition = `${50 + x*120}% ${50 + y*120}%`; });
       a.addEventListener('pointerleave', () => { c.style.transition = ''; c.style.transform = ''; });
     });
   }
