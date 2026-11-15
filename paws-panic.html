@@ -40,6 +40,12 @@
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
   }
   .tip { margin: 0; font: 400 12.5px/normal "Geist Mono", ui-monospace, monospace; color: #777; }
+  .coats { display: flex; gap: 12px; align-items: center; }
+  .coats[hidden] { display: none; }
+  .coats button { appearance: none; border: 0; background: none; padding: 0 0 6px; cursor: pointer; opacity: .45; position: relative; }
+  .coats button.on { opacity: 1; }
+  .coats button.on::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 0; height: 3px; background: #535353; }
+  .coats canvas { display: block; width: 37.5px; height: 31.5px; image-rendering: pixelated; }
   .howto { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 329px; max-width: 100%; }
   .howto svg { width: 45.2222px; height: 44px; display: block; }
   .howto p { margin: 0; font: 400 13px/normal "Silkscreen", ui-monospace, monospace; color: #535353; text-align: center; text-transform: uppercase; }
@@ -64,7 +70,7 @@
     .title { font-size: 30px; gap: 10px; }
     .title .logo { width: 46.63px; height: 38.4px; }
     .tip { display: none; }
-    .bar { justify-content: center; }
+    .bar { justify-content: center; gap: 28px; }
   }
   /* back link: same as kaiju-roar */
   .back{position:fixed;top:40px;left:40px;z-index:10;display:inline-flex;align-items:center;gap:8px;padding:6px 0;
@@ -95,6 +101,7 @@
 </div>
 
 <div class="bar">
+  <div class="coats" id="coats" hidden aria-label="Choose your cat"></div>
   <p class="tip">Click the game first if Space doesn’t respond.</p>
   <button class="sound" id="sound" type="button" aria-pressed="true">
     <svg class="ico-s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-4v12l-4-4H3z" fill="currentColor"/><g id="sndWaves" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M13 7.5a3.5 3.5 0 0 1 0 5"/><path d="M15.5 5a7 7 0 0 1 0 10"/></g><g id="sndOff" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="display:none"><path d="M13 8l4 4M17 8l-4 4"/></g></svg>
@@ -161,6 +168,7 @@
       loCtx.imageSmoothingEnabled = false;
     }
     canvas.style.aspectRatio = LW + ' / ' + LH;
+    const ce = document.getElementById('coats'); if (ce) ce.hidden = W >= 800;
     const cssW = canvas.clientWidth || W;
     const dpr = Math.min(window.devicePixelRatio || 1, 3);
     canvas.width = Math.round(cssW * dpr);
@@ -210,10 +218,31 @@
   let catVar = 'black';
   try { const sv = localStorage.getItem('pawsPanicCoat'); if (CAT_VARS[sv]) catVar = sv; } catch (e) {}
   let CAT_ANIM = CAT_VARS[catVar];
-  function setCoat(v) { catVar = v; CAT_ANIM = CAT_VARS[v]; try { localStorage.setItem('pawsPanicCoat', v); } catch (e) {} }
+  function setCoat(v) { catVar = v; CAT_ANIM = CAT_VARS[v]; try { localStorage.setItem('pawsPanicCoat', v); } catch (e) {} coatUI(); }
+  // phones: the same four heads as buttons under the game
+  const coatsEl = document.getElementById('coats');
+  function coatUI() {
+    if (!coatsEl) return;
+    for (const btn of coatsEl.children) btn.classList.toggle('on', btn.dataset.coat === catVar);
+  }
+  if (coatsEl) {
+    for (const v of CAT_KEYS) {
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.dataset.coat = v; btn.setAttribute('aria-label', v + ' cat');
+      const c = document.createElement('canvas'); c.width = 25; c.height = 21;
+      const img = new Image();
+      img.onload = () => { const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(img, 31, 33, 25, 21, 0, 0, 25, 21); };
+      img.src = CAT_VARS[v].idle.src;
+      btn.appendChild(c);
+      btn.addEventListener('click', () => setCoat(v));
+      coatsEl.appendChild(btn);
+    }
+    coatUI();
+  }
   // coat picker: four little cat heads in the top-left corner
   const PICK = { x: 12, y: 8, w: 25 * PX, h: 21 * PX, gap: 8 };
   const pickAt = (ux, uy) => {
+    if (W < 800) return null;
     for (let i = 0; i < 4; i++) {
       const x = PICK.x + i * (PICK.w + PICK.gap);
       if (ux >= x - 3 && ux <= x + PICK.w + 3 && uy >= PICK.y - 3 && uy <= PICK.y + PICK.h + 6) return CAT_KEYS[i];
@@ -221,6 +250,7 @@
     return null;
   };
   function drawPicker() {
+    if (W < 800) return;
     ctx.imageSmoothingEnabled = false;
     for (let i = 0; i < 4; i++) {
       const v = CAT_KEYS[i], a = CAT_VARS[v].idle, x = PICK.x + i * (PICK.w + PICK.gap);
@@ -1406,11 +1436,9 @@
 
     drawPicker();
     // HUD — positions from the Figma frame (score ends at x=873, HI ends at x=791)
-    const narrow = W < 800;          // phones: HI tucks under the score so it clears the coat picker
-    if (narrow) text('HI ' + pad5(hi), W - 27, 36, 8, MUTED, 'right');
-    else text('HI ' + pad5(hi), W - 136, 14, 16, MUTED, 'right');
+    text('HI ' + pad5(hi), W - 136, 14, 16, MUTED, 'right');
     text(pad5(score), W - 27, 14, 16, flash > 0 ? BRICK : INK, 'right');
-    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, W - 27, narrow ? 52 : 40, 8, BRICK, 'right');
+    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, W - 27, 40, 8, BRICK, 'right');
 
     if (mode === 'ready') {
       const a = 0.55 + 0.45 * Math.sin(time * 3.2);
