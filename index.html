@@ -280,6 +280,9 @@
   .pc-media{z-index:1}
   .pc-media.fit video{object-fit:contain}
   .pc-desc{position:absolute;left:12.5px;top:198.52px;width:167px;margin:0;font-size:9.8px;line-height:12.74px;text-wrap:pretty}
+  /* Paws Panic card (Figma 4697:5498): shorter media, longer description */
+  .pc-media.pc-media-short{height:131px}
+  .pc-desc.pc-desc-long{top:169.52px}
   .pc-foot{position:absolute;left:9.5px;top:253.52px;width:173px;padding:0 2.69px;color:rgba(29,27,23,.7);font-family:'Geist Mono',monospace;font-weight:500;font-size:5.96px;letter-spacing:.12px;white-space:nowrap}
   .pcard:hover .pc{box-shadow:0 0 0 1px rgba(0,0,0,.25),0 14px 24px -10px rgba(0,0,0,.45)}
   .pcard:hover .arrow{transform:translate(2px,-2px)}
@@ -515,6 +518,15 @@
           <div class="pc-head"><span class="pc-logo"><img src="assets/proj-kaiju.webp" alt="" width="15" height="15"></span><b>Kaiju Roar</b><svg class="arrow" viewBox="0 0 16 16" fill="none"><g opacity="0.6"><path d="M4.60577 11.4267L11.394 4.63846M11.3642 10.3251L11.394 4.63846L5.70736 4.66824" stroke="#32302E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
           <div class="pc-media"><video src="assets/proj-kaiju-v2.mp4" poster="assets/proj-kaiju-v2-poster.webp" muted loop playsinline preload="none" aria-label="Gameplay of Kaiju Roar: the kaiju jumps and roars through a city"></video></div>
           <p class="pc-desc">Pixel hypercasual game</p>
+          <div class="pc-foot">game</div>
+        </div>
+      </a>
+      <a class="pcard reveal" href="/paws-panic">
+        <div class="pc">
+          <div class="pc-shine"></div>
+          <div class="pc-head"><span class="pc-logo"><img src="assets/proj-paws-panic.webp" alt="" width="15" height="15"></span><b>Paws Panic</b><svg class="arrow" viewBox="0 0 16 16" fill="none"><g opacity="0.6"><path d="M4.60577 11.4267L11.394 4.63846M11.3642 10.3251L11.394 4.63846L5.70736 4.66824" stroke="#32302E" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
+          <div class="pc-media pc-media-short"><video src="assets/proj-paws-panic.mp4" poster="assets/proj-paws-panic-poster.webp" muted loop playsinline preload="none" aria-label="Gameplay of Paws Panic: a black cat hops from rooftop to rooftop, landing perfect jumps and grabbing a ledge"></video></div>
+          <p class="pc-desc pc-desc-long">Inspired by real-life house cat zoomies, tests your reflexes in broad daylight as a panicked cat leaps from rooftop to rooftop.</p>
           <div class="pc-foot">game</div>
         </div>
       </a>
