@@ -112,7 +112,7 @@
   'use strict';
 
   /* ---------- constants (all in Figma px: canvas is 900 × 255) ---------- */
-  const W = 900, H = 255;
+  let W = 900; const H = 255;   // W shrinks on phones (see resize) so sprites stay big, like kaiju-roar
   const ROOF_Y = 152;            // top edge of every roof
   const B_H = 150;               // drawn building height (runs past the canvas bottom)
   const CAT_AX = 21, CAT_AY = 50; // cat anchor: between the paws, on the roof line
@@ -143,14 +143,24 @@
   /* ---------- canvas ---------- */
   const canvas = document.getElementById('game');
   const mainCtx = canvas.getContext('2d');
-  const LW = Math.round(W / PX), LH = Math.round(H / PX);
+  let LW = Math.round(W / PX); const LH = Math.round(H / PX);
   const lo = document.createElement('canvas'); lo.width = LW; lo.height = LH;
   const loCtx = lo.getContext('2d', { willReadFrequently: true });
   const catLo = document.createElement('canvas'); catLo.width = LW; catLo.height = LH;
   const catCtx = catLo.getContext('2d', { willReadFrequently: true });
   let ctx = loCtx;               // the scene is drawn into the low-res buffer
   let scale = 1 / PX, mainScale = 1;
+  const PHONE_ZOOM = 1.5;         // css px per art pixel on narrow screens (kaiju-roar draws its dino 1.5× on phones)
   function resize() {
+    // Narrow screens show less of the world at ~1:1 so the cat and roofs stay big (same idea as kaiju-roar).
+    const w0 = canvas.clientWidth || 900;
+    const lw = w0 < 600 ? Math.max(260, Math.round(w0 / PHONE_ZOOM)) : 600;
+    if (lw !== LW) {
+      LW = lw; W = LW * PX;
+      lo.width = LW; catLo.width = LW;
+      loCtx.imageSmoothingEnabled = false;
+    }
+    canvas.style.aspectRatio = LW + ' / ' + LH;
     const cssW = canvas.clientWidth || W;
     const dpr = Math.min(window.devicePixelRatio || 1, 3);
     canvas.width = Math.round(cssW * dpr);
@@ -1396,16 +1406,19 @@
 
     drawPicker();
     // HUD — positions from the Figma frame (score ends at x=873, HI ends at x=791)
-    text('HI ' + pad5(hi), 764, 14, 16, MUTED, 'right');
-    text(pad5(score), 873, 14, 16, flash > 0 ? BRICK : INK, 'right');
-    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, 873, 40, 8, BRICK, 'right');
+    const narrow = W < 800;          // phones: HI tucks under the score so it clears the coat picker
+    if (narrow) text('HI ' + pad5(hi), W - 27, 36, 8, MUTED, 'right');
+    else text('HI ' + pad5(hi), W - 136, 14, 16, MUTED, 'right');
+    text(pad5(score), W - 27, 14, 16, flash > 0 ? BRICK : INK, 'right');
+    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, W - 27, narrow ? 52 : 40, 8, BRICK, 'right');
 
     if (mode === 'ready') {
       const a = 0.55 + 0.45 * Math.sin(time * 3.2);
       ctx.globalAlpha = 0.5 + a * 0.5;
-      text('HOLD SPACE TO WIND UP - RELEASE TO HOP', W / 2, 62, 8, INK, 'center');
+      const nar = W < 800;
+      text(nar ? 'HOLD TO WIND UP - RELEASE TO HOP' : 'HOLD SPACE TO WIND UP - RELEASE TO HOP', W / 2, 62, 8, INK, 'center');
       ctx.globalAlpha = 1;
-      text('LAND DEAD CENTRE FOR A COMBO. CRACKED ROOFS FALL.', W / 2, 82, 8, MUTED, 'center');
+      text(nar ? 'LAND DEAD CENTRE FOR A COMBO' : 'LAND DEAD CENTRE FOR A COMBO. CRACKED ROOFS FALL.', W / 2, 82, 8, MUTED, 'center');
     } else if (mode === 'over') {
       const k = clamp(overT / 0.35, 0, 1);
       ctx.globalAlpha = k * 0.72; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
