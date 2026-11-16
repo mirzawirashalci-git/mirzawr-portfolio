@@ -40,6 +40,12 @@
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
   }
   .tip { margin: 0; font: 400 12.5px/normal "Geist Mono", ui-monospace, monospace; color: #777; }
+  .coats { display: flex; gap: 12px; align-items: center; }
+  .coats[hidden] { display: none; }
+  .coats button { appearance: none; border: 0; background: none; padding: 0 0 6px; cursor: pointer; opacity: .45; position: relative; }
+  .coats button.on { opacity: 1; }
+  .coats button.on::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 0; height: 3px; background: #535353; }
+  .coats canvas { display: block; width: 37.5px; height: 31.5px; image-rendering: pixelated; }
   .howto { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 329px; max-width: 100%; }
   .howto svg { width: 45.2222px; height: 44px; display: block; }
   .howto p { margin: 0; font: 400 13px/normal "Silkscreen", ui-monospace, monospace; color: #535353; text-align: center; text-transform: uppercase; }
@@ -64,7 +70,7 @@
     .title { font-size: 30px; gap: 10px; }
     .title .logo { width: 46.63px; height: 38.4px; }
     .tip { display: none; }
-    .bar { justify-content: center; }
+    .bar { justify-content: space-between; }   /* cat picker hard left, Sound hard right */
   }
   /* back link: same as kaiju-roar */
   .back{position:fixed;top:40px;left:40px;z-index:10;display:inline-flex;align-items:center;gap:8px;padding:6px 0;
@@ -95,6 +101,7 @@
 </div>
 
 <div class="bar">
+  <div class="coats" id="coats" hidden aria-label="Choose your cat"></div>
   <p class="tip">Click the game first if Space doesn’t respond.</p>
   <button class="sound" id="sound" type="button" aria-pressed="true">
     <svg class="ico-s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-4v12l-4-4H3z" fill="currentColor"/><g id="sndWaves" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M13 7.5a3.5 3.5 0 0 1 0 5"/><path d="M15.5 5a7 7 0 0 1 0 10"/></g><g id="sndOff" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="display:none"><path d="M13 8l4 4M17 8l-4 4"/></g></svg>
@@ -112,7 +119,7 @@
   'use strict';
 
   /* ---------- constants (all in Figma px: canvas is 900 × 255) ---------- */
-  const W = 900, H = 255;
+  let W = 900; const H = 255;   // W shrinks on phones (see resize) so sprites stay big, like kaiju-roar
   const ROOF_Y = 152;            // top edge of every roof
   const B_H = 150;               // drawn building height (runs past the canvas bottom)
   const CAT_AX = 21, CAT_AY = 50; // cat anchor: between the paws, on the roof line
@@ -143,14 +150,25 @@
   /* ---------- canvas ---------- */
   const canvas = document.getElementById('game');
   const mainCtx = canvas.getContext('2d');
-  const LW = Math.round(W / PX), LH = Math.round(H / PX);
+  let LW = Math.round(W / PX); const LH = Math.round(H / PX);
   const lo = document.createElement('canvas'); lo.width = LW; lo.height = LH;
   const loCtx = lo.getContext('2d', { willReadFrequently: true });
   const catLo = document.createElement('canvas'); catLo.width = LW; catLo.height = LH;
   const catCtx = catLo.getContext('2d', { willReadFrequently: true });
   let ctx = loCtx;               // the scene is drawn into the low-res buffer
   let scale = 1 / PX, mainScale = 1;
+  const PHONE_ZOOM = 1.5;         // css px per art pixel on narrow screens (kaiju-roar draws its dino 1.5× on phones)
   function resize() {
+    // Narrow screens show less of the world at ~1:1 so the cat and roofs stay big (same idea as kaiju-roar).
+    const w0 = canvas.clientWidth || 900;
+    const lw = w0 < 600 ? Math.max(260, Math.round(w0 / PHONE_ZOOM)) : 600;
+    if (lw !== LW) {
+      LW = lw; W = LW * PX;
+      lo.width = LW; catLo.width = LW;
+      loCtx.imageSmoothingEnabled = false;
+    }
+    canvas.style.aspectRatio = LW + ' / ' + LH;
+    const ce = document.getElementById('coats'); if (ce) ce.hidden = W >= 800;
     const cssW = canvas.clientWidth || W;
     const dpr = Math.min(window.devicePixelRatio || 1, 3);
     canvas.width = Math.round(cssW * dpr);
@@ -200,10 +218,31 @@
   let catVar = 'black';
   try { const sv = localStorage.getItem('pawsPanicCoat'); if (CAT_VARS[sv]) catVar = sv; } catch (e) {}
   let CAT_ANIM = CAT_VARS[catVar];
-  function setCoat(v) { catVar = v; CAT_ANIM = CAT_VARS[v]; try { localStorage.setItem('pawsPanicCoat', v); } catch (e) {} }
+  function setCoat(v) { catVar = v; CAT_ANIM = CAT_VARS[v]; try { localStorage.setItem('pawsPanicCoat', v); } catch (e) {} coatUI(); }
+  // phones: the same four heads as buttons under the game
+  const coatsEl = document.getElementById('coats');
+  function coatUI() {
+    if (!coatsEl) return;
+    for (const btn of coatsEl.children) btn.classList.toggle('on', btn.dataset.coat === catVar);
+  }
+  if (coatsEl) {
+    for (const v of CAT_KEYS) {
+      const btn = document.createElement('button');
+      btn.type = 'button'; btn.dataset.coat = v; btn.setAttribute('aria-label', v + ' cat');
+      const c = document.createElement('canvas'); c.width = 25; c.height = 21;
+      const img = new Image();
+      img.onload = () => { const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(img, 31, 33, 25, 21, 0, 0, 25, 21); };
+      img.src = CAT_VARS[v].idle.src;
+      btn.appendChild(c);
+      btn.addEventListener('click', () => setCoat(v));
+      coatsEl.appendChild(btn);
+    }
+    coatUI();
+  }
   // coat picker: four little cat heads in the top-left corner
   const PICK = { x: 12, y: 8, w: 25 * PX, h: 21 * PX, gap: 8 };
   const pickAt = (ux, uy) => {
+    if (W < 800) return null;
     for (let i = 0; i < 4; i++) {
       const x = PICK.x + i * (PICK.w + PICK.gap);
       if (ux >= x - 3 && ux <= x + PICK.w + 3 && uy >= PICK.y - 3 && uy <= PICK.y + PICK.h + 6) return CAT_KEYS[i];
@@ -211,6 +250,7 @@
     return null;
   };
   function drawPicker() {
+    if (W < 800) return;
     ctx.imageSmoothingEnabled = false;
     for (let i = 0; i < 4; i++) {
       const v = CAT_KEYS[i], a = CAT_VARS[v].idle, x = PICK.x + i * (PICK.w + PICK.gap);
@@ -337,6 +377,20 @@
   }
   soundUI();
   let ac = null, master = null, chargeOsc = null, chargeGain = null, rumble = null;
+  // iPhone: keep game sound playing even when the ring/silent switch is on (iOS 17+), same as kaiju-roar.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+  // iOS only unlocks audio on touchend/click: resume the context and play one silent sample there.
+  // Older iOS (no audioSession API) also gets a silent looping <audio> so the silent switch doesn't mute us.
+  let unlockEl = null;
+  function unlockAudio() {
+    const a = audio(); if (!a) return;
+    try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); } catch (e) {}
+    if (!navigator.audioSession && !unlockEl && /iP(hone|ad|od)/.test(navigator.userAgent)) {
+      unlockEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+      unlockEl.loop = true; unlockEl.setAttribute('playsinline', ''); unlockEl.play().catch(() => { unlockEl = null; });
+    }
+  }
+  ['touchend', 'click', 'keydown'].forEach(t => window.addEventListener(t, unlockAudio, { capture: true, passive: true }));
   function audio() {
     if (!soundOn) return null;
     try {
@@ -1280,7 +1334,7 @@
   }
 
   function text(str, x, y, size, col, align, spacing) {
-    size = Math.max(8, Math.round(size / 8) * 8);
+    size = Math.max(8, Math.round(size / 4) * 4);
     ctx.font = size + 'px ' + MONO; ctx.fillStyle = col; ctx.textAlign = align || 'left'; ctx.textBaseline = 'top';
     if ('letterSpacing' in ctx) ctx.letterSpacing = (spacing || 0) + 'px';
     ctx.fillText(str, x, y);
@@ -1396,16 +1450,20 @@
 
     drawPicker();
     // HUD — positions from the Figma frame (score ends at x=873, HI ends at x=791)
-    text('HI ' + pad5(hi), 764, 14, 16, MUTED, 'right');
-    text(pad5(score), 873, 14, 16, flash > 0 ? BRICK : INK, 'right');
-    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, 873, 40, 8, BRICK, 'right');
+    // same placement as kaiju-roar: score 10 art px from the top-right corner, HI 18 px to its left
+    // (desktop: 1 art px = 1.5 css px; phones: 1 art px = 1 css px, so the numbers stay the same on screen)
+    const ph = W < 800, m = ph ? 10 : 15, sz = ph ? 12 : 16, gap = ph ? 18 : 27;
+    text('HI ' + pad5(hi), W - m - sz * 5 - gap, m, sz, MUTED, 'right');
+    text(pad5(score), W - m, m, sz, flash > 0 ? BRICK : INK, 'right');
+    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, W - m, m + sz + 10, 8, BRICK, 'right');
 
     if (mode === 'ready') {
       const a = 0.55 + 0.45 * Math.sin(time * 3.2);
       ctx.globalAlpha = 0.5 + a * 0.5;
-      text('HOLD SPACE TO WIND UP - RELEASE TO HOP', W / 2, 62, 8, INK, 'center');
+      const nar = W < 800;
+      text(nar ? 'HOLD TO WIND UP - RELEASE TO HOP' : 'HOLD SPACE TO WIND UP - RELEASE TO HOP', W / 2, 62, 8, INK, 'center');
       ctx.globalAlpha = 1;
-      text('LAND DEAD CENTRE FOR A COMBO. CRACKED ROOFS FALL.', W / 2, 82, 8, MUTED, 'center');
+      text(nar ? 'LAND DEAD CENTRE FOR A COMBO' : 'LAND DEAD CENTRE FOR A COMBO. CRACKED ROOFS FALL.', W / 2, 82, 8, MUTED, 'center');
     } else if (mode === 'over') {
       const k = clamp(overT / 0.35, 0, 1);
       ctx.globalAlpha = k * 0.72; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
