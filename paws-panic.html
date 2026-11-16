@@ -377,6 +377,20 @@
   }
   soundUI();
   let ac = null, master = null, chargeOsc = null, chargeGain = null, rumble = null;
+  // iPhone: keep game sound playing even when the ring/silent switch is on (iOS 17+), same as kaiju-roar.
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+  // iOS only unlocks audio on touchend/click: resume the context and play one silent sample there.
+  // Older iOS (no audioSession API) also gets a silent looping <audio> so the silent switch doesn't mute us.
+  let unlockEl = null;
+  function unlockAudio() {
+    const a = audio(); if (!a) return;
+    try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); } catch (e) {}
+    if (!navigator.audioSession && !unlockEl && /iP(hone|ad|od)/.test(navigator.userAgent)) {
+      unlockEl = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+      unlockEl.loop = true; unlockEl.setAttribute('playsinline', ''); unlockEl.play().catch(() => { unlockEl = null; });
+    }
+  }
+  ['touchend', 'click', 'keydown'].forEach(t => window.addEventListener(t, unlockAudio, { capture: true, passive: true }));
   function audio() {
     if (!soundOn) return null;
     try {
