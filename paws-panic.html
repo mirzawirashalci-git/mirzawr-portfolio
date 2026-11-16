@@ -70,7 +70,7 @@
     .title { font-size: 30px; gap: 10px; }
     .title .logo { width: 46.63px; height: 38.4px; }
     .tip { display: none; }
-    .bar { justify-content: center; gap: 28px; }
+    .bar { justify-content: space-between; }   /* cat picker hard left, Sound hard right */
   }
   /* back link: same as kaiju-roar */
   .back{position:fixed;top:40px;left:40px;z-index:10;display:inline-flex;align-items:center;gap:8px;padding:6px 0;
@@ -1320,7 +1320,7 @@
   }
 
   function text(str, x, y, size, col, align, spacing) {
-    size = Math.max(8, Math.round(size / 8) * 8);
+    size = Math.max(8, Math.round(size / 4) * 4);
     ctx.font = size + 'px ' + MONO; ctx.fillStyle = col; ctx.textAlign = align || 'left'; ctx.textBaseline = 'top';
     if ('letterSpacing' in ctx) ctx.letterSpacing = (spacing || 0) + 'px';
     ctx.fillText(str, x, y);
@@ -1436,9 +1436,12 @@
 
     drawPicker();
     // HUD — positions from the Figma frame (score ends at x=873, HI ends at x=791)
-    text('HI ' + pad5(hi), W - 136, 14, 16, MUTED, 'right');
-    text(pad5(score), W - 27, 14, 16, flash > 0 ? BRICK : INK, 'right');
-    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, W - 27, 40, 8, BRICK, 'right');
+    // same placement as kaiju-roar: score 10 art px from the top-right corner, HI 18 px to its left
+    // (desktop: 1 art px = 1.5 css px; phones: 1 art px = 1 css px, so the numbers stay the same on screen)
+    const ph = W < 800, m = ph ? 10 : 15, sz = ph ? 12 : 16, gap = ph ? 18 : 27;
+    text('HI ' + pad5(hi), W - m - sz * 5 - gap, m, sz, MUTED, 'right');
+    text(pad5(score), W - m, m, sz, flash > 0 ? BRICK : INK, 'right');
+    if (chain > 1 && mode === 'play') text('CHAIN X' + chain, W - m, m + sz + 10, 8, BRICK, 'right');
 
     if (mode === 'ready') {
       const a = 0.55 + 0.45 * Math.sin(time * 3.2);
