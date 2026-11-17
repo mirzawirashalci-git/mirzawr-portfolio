@@ -890,17 +890,9 @@
     } else if (cat.state === 'hang') {
       updateHang(dt);
     } else if (cat.state === 'walk') {
-      // after touching down the cat pads over to the middle of the roof, then sits
-      const mid = (cat.on.L + cat.on.R) / 2, dx = mid - cat.x;
-      if (cat.squash < 0.2) {
-        if (Math.abs(dx) < 1.2) { cat.x = mid; cat.state = 'idle'; cat.face = 1; cat.squash = 0.22; }
-        else {
-          const v = Math.min(Math.abs(dx), 50 * dt);
-          cat.face = dx > 0 ? 1 : -1; cat.x += cat.face * v; cat.walk += v / 23;   // 23px per full stride
-          const n = Math.floor(cat.walk * 2);
-          if (n !== cat.stepN) { cat.stepN = n; sfx.step(); }
-        }
-      }
+      // after touching down the cat stays where it landed (no walk back to the middle),
+      // so a short tap really moves it just a little; it settles once the landing squash is done
+      if (cat.squash < 0.2) { cat.state = 'idle'; cat.face = 1; cat.squash = 0.22; }
     }
     cat.squash = lerp(cat.squash, 0, 1 - Math.exp(-dt * 11));
     cat.crouch = lerp(cat.crouch || 0, cat.state === 'charge' ? cat.charge : 0, 1 - Math.exp(-dt * 14));
