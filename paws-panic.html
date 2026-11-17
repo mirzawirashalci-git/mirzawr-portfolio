@@ -285,7 +285,7 @@
       return p < 0.06 ? ['jump', 1] : p < 0.25 ? ['jump', 2] : p < 0.5 ? ['jump', 3] : p < 0.66 ? ['fall', 0] : p < 0.84 ? ['fall', 1] : ['fall', 2];
     }
     if (st === 'fall') return ['fall', 1 + (Math.floor(time * 8) % 2)];
-    if (st === 'teeter') return cat.teeterT > 0.35 ? ['crouch', loopF('crouch', time)] : ['walk', Math.floor(cat.walk * 8) % 8];
+    if (st === 'teeter') return cat.teeterT > 0.35 ? ['fright', 2 + loopF('fright', time) % 6] : ['walk', Math.floor(cat.walk * 8) % 8];
     if (st === 'walk') return cat.squash > 0.3 ? ['land', 0] : cat.squash > 0.12 ? ['land', 1] : ['walk', Math.floor(cat.walk * 8) % 8];
     if (cat.on && cat.on.state === 'shake') return ['fright', 2 + loopF('fright', time) % 6];
     const rest = time - idleSince;                          // left alone it sits, lies down, then dozes off
@@ -324,7 +324,7 @@
       const dx = cat.state === 'charge' ? Math.round(Math.sin(time * 30) * (cat.charge || 0) * 0.8) * PX : 0;
       ctx.translate(Math.round((X + dx) / PX) * PX, Math.round(Y / PX) * PX);
       if (cat.state === 'fall') { ctx.translate(0, -16 * CSP); ctx.rotate(cat.rot * 0.6); ctx.translate(0, 16 * CSP); }
-      if (cat.state === 'teeter' && cat.teeterT > 0.35) ctx.rotate(cat.teeterDir * (0.05 + Math.sin(time * 15) * 0.08));   // lean over the edge, wobbling on its paws
+      if (cat.state === 'teeter' && cat.teeterT > 0.35) ctx.translate(Math.round(Math.sin(time * 40) * 1.2) * PX, 0);   // startled shiver at the edge
       ctx.scale(cat.face, 1);
       ctx.drawImage(a.img, f * FS2, 0, FS2, FS2, -C_PIVOT * CSP, -C_FOOT * CSP, S, S);
     }
