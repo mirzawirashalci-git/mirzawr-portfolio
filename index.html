@@ -981,6 +981,7 @@
   };
 
   /* ---------- Routing (study case pages) ---------- */
+  let lastStudy = null;
   function route(){
     const h = location.hash.slice(1);
     const s = studies.find(x => x.id === h);
@@ -991,8 +992,11 @@
     if (s) {
       renderStudy(s);
       document.title = "Mirza's Portfolio";
+      // count each opened study case as its own page in Vercel Analytics (/study/adaro, /study/ajaib, ...)
+      if (lastStudy !== s.id) { lastStudy = s.id; try { window.va('pageview', { route: '/study/' + s.id, path: '/study/' + s.id }); } catch (e) {} }
       window.scrollTo(0,0); setActive('study'); setTimeout(() => setActive('study'), 480);
     } else {
+      lastStudy = null;
       document.title = "Mirza's Portfolio";
       if (['study','projects','experience','work','home'].includes(h)) requestAnimationFrame(() => goTo(h));
     }
