@@ -290,6 +290,8 @@
   .exp{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:4px 16px}
   .exp .right{text-align:right}
   .exp .t-title{justify-content:flex-start}
+  .exp > div:not(.right) .t-title{display:block}
+  .exp > div:not(.right) .t-title .arrow{display:inline-block;vertical-align:-2px;margin-left:4px}
   .exp .right .t-title{justify-content:flex-end}
 
   /* Study case folders */
