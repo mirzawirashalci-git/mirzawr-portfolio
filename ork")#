@@ -1,0 +1,1 @@
+            await pg.goto("http://localhost:8765/; await pg.wait_for_timeout(2500)
