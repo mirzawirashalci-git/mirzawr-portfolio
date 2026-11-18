@@ -322,10 +322,8 @@
   .debto{display:flex;gap:10px}
   .debto > div{flex:1;display:flex;flex-direction:column;gap:10px}
   .work .shot img{image-rendering:auto}
-  .shot.stroke{box-shadow:0 0 0 1px #F1F1F1}
-  .shot.stroke:hover{box-shadow:0 0 0 1px #F1F1F1,0 12px 28px -12px rgba(30,29,27,.22)}
-  html.dark .shot.stroke{box-shadow:0 0 0 1px rgba(255,255,255,.08)}
-  html.dark .shot.stroke:hover{box-shadow:0 0 0 1px rgba(255,255,255,.08),0 12px 28px -12px rgba(0,0,0,.6)}
+  .shot.ext{overflow:visible;border-radius:9px}
+  .shot.ext img{width:calc(100% + 2px);max-width:none;margin:-1px}
 
   /* Connect */
   .chips{display:flex;gap:12px;flex-wrap:wrap;padding-top:20px}
@@ -570,11 +568,11 @@
       <div class="t-sub" style="max-width:484px">Financial management application specifically designed to record and manage debts and receivables</div>
       <div class="media debto">
         <div>
-          <div class="shot stroke" data-cap="DEBTO — Landing page"><img src="assets/work-debto-1.webp" alt="Debto landing page" loading="lazy"></div>
-          <div class="shot stroke" data-cap="DEBTO — App store screens"><img src="assets/work-debto-3.webp" alt="Debto app screens" loading="lazy"></div>
+          <div class="shot ext" data-cap="DEBTO — Landing page"><img src="assets/work-debto-1.webp" alt="Debto landing page" loading="lazy"></div>
+          <div class="shot ext" data-cap="DEBTO — App store screens"><img src="assets/work-debto-3.webp" alt="Debto app screens" loading="lazy"></div>
         </div>
         <div>
-          <div class="shot stroke" data-cap="DEBTO — Features"><img src="assets/work-debto-2.webp" alt="Debto features" loading="lazy"></div>
+          <div class="shot ext" data-cap="DEBTO — Features"><img src="assets/work-debto-2.webp" alt="Debto features" loading="lazy"></div>
         </div>
       </div>
     </div>
@@ -583,7 +581,7 @@
       <div class="media debto" style="padding-top:10px">
         <div>
           <div class="shot" data-cap="Farm Asisten — Mobile app"><img src="assets/work-adaro-mobile.webp" alt="Farm Asisten mobile app screens" loading="lazy"></div>
-          <div class="shot" data-cap="ADARO — Control room web"><img src="assets/work-adaro-web.webp" alt="Fleet dashboard web" loading="lazy"></div>
+          <div class="shot plain" data-cap="ADARO — Control room web"><img src="assets/work-adaro-web.webp" alt="Fleet dashboard web" loading="lazy"></div>
         </div>
         <div>
           <div class="shot plain" data-cap="ADARO — Driver tablet"><img src="assets/work-adaro-tablet.webp" alt="Driver tablet app" loading="lazy"></div>
