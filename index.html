@@ -556,23 +556,23 @@
     <div class="item reveal">
       <div class="t-title">DGI Landing Page</div>
       <div class="t-sub" style="max-width:484px">dayagagas.id</div>
-      <div class="media"><div class="shot" data-cap="Daya Gagas Internasional — Landing page"><img src="assets/work-dgi-landing.webp" alt="Daya Gagas Internasional landing page" loading="lazy"></div></div>
+      <div class="media"><div class="shot" data-cap="Daya Gagas Internasional — Landing page" data-full="assets/work-dgi-landing@full.webp"><img src="assets/work-dgi-landing.webp" alt="Daya Gagas Internasional landing page" loading="lazy"></div></div>
     </div>
     <div class="item reveal">
       <div class="t-title">SITABA</div>
       <div class="t-sub" style="max-width:484px">Digital platform for documenting incidents and disaster management in Indonesia</div>
-      <div class="media"><div class="shot" data-cap="SITABA — Kementerian PU"><img src="assets/work-sitaba.webp" alt="SITABA dashboard" width="1812" height="1236" loading="lazy"></div></div>
+      <div class="media"><div class="shot" data-cap="SITABA — Kementerian PU" data-full="assets/work-sitaba@full.webp"><img src="assets/work-sitaba.webp" alt="SITABA dashboard" width="1812" height="1236" loading="lazy"></div></div>
     </div>
     <div class="item reveal">
       <div class="t-title">DEBTO</div>
       <div class="t-sub" style="max-width:484px">Financial management application specifically designed to record and manage debts and receivables</div>
       <div class="media debto">
         <div>
-          <div class="shot ext" data-cap="DEBTO — Landing page"><img src="assets/work-debto-1.webp" alt="Debto landing page" loading="lazy"></div>
-          <div class="shot ext" data-cap="DEBTO — App store screens"><img src="assets/work-debto-3.webp" alt="Debto app screens" loading="lazy"></div>
+          <div class="shot ext" data-cap="DEBTO — Landing page" data-full="assets/work-debto-1@full.webp"><img src="assets/work-debto-1.webp" alt="Debto landing page" loading="lazy"></div>
+          <div class="shot ext" data-cap="DEBTO — App store screens" data-full="assets/work-debto-3@full.webp"><img src="assets/work-debto-3.webp" alt="Debto app screens" loading="lazy"></div>
         </div>
         <div>
-          <div class="shot ext" data-cap="DEBTO — Features"><img src="assets/work-debto-2.webp" alt="Debto features" loading="lazy"></div>
+          <div class="shot ext" data-cap="DEBTO — Features" data-full="assets/work-debto-2@full.webp"><img src="assets/work-debto-2.webp" alt="Debto features" loading="lazy"></div>
         </div>
       </div>
     </div>
@@ -580,11 +580,11 @@
       <div class="media"><div class="wvid"><video src="assets/work-datalabs.mp4" poster="assets/work-datalabs-poster.webp" muted loop playsinline preload="none" aria-label="datalabs landing page hero with animated background"></video></div></div>
       <div class="media debto" style="padding-top:10px">
         <div>
-          <div class="shot" data-cap="Farm Asisten — Mobile app"><img src="assets/work-adaro-mobile.webp" alt="Farm Asisten mobile app screens" loading="lazy"></div>
-          <div class="shot plain" data-cap="ADARO — Control room web"><img src="assets/work-adaro-web.webp" alt="Fleet dashboard web" loading="lazy"></div>
+          <div class="shot" data-cap="Farm Asisten — Mobile app" data-full="assets/work-adaro-mobile@full.webp"><img src="assets/work-adaro-mobile.webp" alt="Farm Asisten mobile app screens" loading="lazy"></div>
+          <div class="shot plain" data-cap="ADARO — Control room web" data-full="assets/work-adaro-web@full.webp"><img src="assets/work-adaro-web.webp" alt="Fleet dashboard web" loading="lazy"></div>
         </div>
         <div>
-          <div class="shot plain" data-cap="ADARO — Driver tablet"><img src="assets/work-adaro-tablet.webp" alt="Driver tablet app" loading="lazy"></div>
+          <div class="shot plain" data-cap="ADARO — Driver tablet" data-full="assets/work-adaro-tablet@full.webp"><img src="assets/work-adaro-tablet.webp" alt="Driver tablet app" loading="lazy"></div>
         </div>
       </div>
     </div>
@@ -774,7 +774,9 @@
   /* ---------- Lightbox ---------- */
   const lb = $('#lb'), lbImg = $('img', lb), lbCap = $('.cap', lb);
   document.addEventListener('click', e => { const s = e.target.closest('.shot'); if (!s) return;
-    lbImg.src = $('img', s).src; lbCap.textContent = s.dataset.cap || ''; lb.classList.add('open'); });
+    const full = s.dataset.full; lbImg.style.maxWidth = '';
+    if (full) { lbImg.onload = () => { lbImg.style.maxWidth = `min(1100px, 100%, ${Math.round(lbImg.naturalWidth/2)}px)`; lbImg.onload = null; }; }
+    lbImg.src = full || $('img', s).src; lbCap.textContent = s.dataset.cap || ''; lb.classList.add('open'); });
   function closeLb(){ lb.classList.remove('open'); }
   lb.addEventListener('click', closeLb);
 
