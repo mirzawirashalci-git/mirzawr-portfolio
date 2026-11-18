@@ -562,7 +562,7 @@
     const b = makeBuilding(type, n, prev.x + prev.w + gap, fragile);
     b.idx = ++spawnIdx;
     maybeBird(b);
-    b.dur = 1.0;                                                     // every fragile roof gives way after the same 1 s
+    b.dur = 1.2;                                                     // every fragile roof gives way after the same 1.2 s
     buildings.push(b);
   }
 
