@@ -552,17 +552,17 @@
   function spawnNext() {
     const prev = buildings[buildings.length - 1];
     const lvl = spawnIdx;
-    const gap = rand(26, 46 + Math.min(lvl, 30) * 3.1);
+    const gap = rand(26, 46 + Math.min(lvl, 40) * 1.9);            // widest gap ~122 (was ~139), reached later
     const r = Math.random();
     let type, n;
     if (r < 0.36) { type = 'B'; n = lvl > 12 && Math.random() < 0.5 ? 2 : (Math.random() < 0.6 ? 3 : 4); }
     else { type = r < 0.68 ? 'A' : 'C'; n = Math.random() < 0.7 ? 2 : 3; }
-    const fragile = lvl >= 3 && Math.random() < Math.min(0.45, 0.14 + lvl * 0.012);
+    const fragile = lvl >= 3 && Math.random() < Math.min(0.32, 0.12 + lvl * 0.006);   // at most ~1 in 3 roofs (was ~1 in 2)
     if (fragile) { type = 'B'; n = 3; }
     const b = makeBuilding(type, n, prev.x + prev.w + gap, fragile);
     b.idx = ++spawnIdx;
     maybeBird(b);
-    b.dur = Math.max(0.7, 1.35 - lvl * 0.014);
+    b.dur = 1.35;                                                    // every fragile roof gives way after the same 1.35 s
     buildings.push(b);
   }
 
